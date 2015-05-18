@@ -8,6 +8,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,11 +17,16 @@ public class Cofile implements Config{
     byte[] hash;
     String filename;
     String path;
+    Date modDate;
 
-    public Cofile(String path,String filename) {
+
+
+
+    public Cofile(String path,String filename,Date date) {
         super();
         this.path = path;
         this.filename = filename;
+        this.modDate=date;
     }
     public String getPath() {
         return path;
@@ -81,6 +88,13 @@ public class Cofile implements Config{
         return DiffUtils.diff(original, revised);
     }
 
+    public Date getModDate() {
+        return modDate;
+    }
+
+    public void setModDate(Date modDate) {
+        this.modDate = modDate;
+    }
 
 
     public String getHexHash(){
