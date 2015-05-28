@@ -110,9 +110,33 @@ public class CoWatcher extends Thread{
                 Path child = dir.resolve(name);
 
                 // Si suppression
-               if(kind==ENTRY_DELETE){
+                if(kind==ENTRY_DELETE){
+                    try {
+                        System.out.format("%s: %s\n", event.kind().name(),child.getFileName());
+                        String filename=child.getFileName().toString();
+                        String path=Paths.get(Config.root).relativize(child).toString().substring(0, Paths.get(Config.root).relativize(child).toString().length() - child.getFileName().toString().length());
+                        SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        String datesql=sdf.format(new File(child.toUri()).lastModified());
+                        System.out.println("Modifié le "+datesql);
+                        db.update("UPDATE FILES SET SUPPRESSED=1 WHERE NAME='"+filename+"' AND PATH='"+path+"'");
+                    }catch (Exception se){
+                        System.out.println(se);
+                    }
+                }
 
-               }
+                if(kind==ENTRY_MODIFY){
+                    try {
+                        System.out.format("%s: %s\n", event.kind().name(),child.getFileName());
+                        String filename=child.getFileName().toString();
+                        String path=Paths.get(Config.root).relativize(child).toString().substring(0, Paths.get(Config.root).relativize(child).toString().length() - child.getFileName().toString().length());
+                        SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        String datesql=sdf.format(new File(child.toUri()).lastModified());
+                        System.out.println("Modifié le "+datesql);
+                        db.update("UPDATE FILES SET DATE='"+datesql+"' WHERE NAME='"+filename+"' AND PATH='"+path+"'");
+                    }catch (Exception se){
+                        System.out.println(se);
+                    }
+                }
 
                 // Si creation
                 if (kind == ENTRY_CREATE) {
@@ -129,11 +153,11 @@ public class CoWatcher extends Thread{
                                 String path=Paths.get(Config.root).relativize(child).toString().substring(0, Paths.get(Config.root).relativize(child).toString().length() - child.getFileName().toString().length());
                                 SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                                 String datesql=sdf.format(new File(child.toUri()).lastModified());
-                                System.out.println("Modifié le "+datesql);
-                                db.query("INSERT INTO FILES(ID,NAME,PATH,DATE,SUPPRESSED) VALUES (1,'"+filename+"','"+path+"','"+datesql+"',0)");
+                                System.out.println("Créé le "+datesql);
+                                db.update("INSERT INTO FILES(NAME,PATH,DATE,SUPPRESSED) VALUES ('"+filename+"','"+path+"','"+datesql+"',0)");
                             }catch (Exception se){
+                                System.out.println(se);
                             }
-
                         }
                     } catch (IOException x) {
                         
