@@ -45,7 +45,9 @@ public class Cosync {
         watcher.saveSuppressed(db);
 
         System.out.println(cpt);
-        Coserver server=new Coserver();
+        Runnable server = new Coserver();
+        Thread threadServer= new Thread(server);
+        threadServer.start();
 
         db.executeBatchInsert();
         db.executeBatchUpdate();

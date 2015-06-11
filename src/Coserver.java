@@ -7,7 +7,7 @@ import java.net.Socket;
 public class Coserver
         implements Runnable{
 
-    private int port = 5152;
+    private int port = 80;
     private int  count = 0;
 
 
