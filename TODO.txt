@@ -1,0 +1,5 @@
+Regler le soucis des boutton register/unregister : (ils s'activent tous en même temps)
+
+?Ajouter l'option pour rajouter un system ?
+
+Faire évoluer l'interface Russian style

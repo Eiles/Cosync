@@ -2,6 +2,8 @@
 	require_once 'tool.php';
 	require_once 'user.php';
 	displayHTMLHeader("Accueil CoSync");
+	
+	session_start();
 ?>
 	Bienvenue !!
 	<br>
@@ -21,15 +23,9 @@
 			$username=$_POST["username"];
 			$password=$_POST["password"];
 			
-			connection($username,$password);
-			
-			/*
-			if($ligne[0]==$name && $ligne[1]==$password)
-				header("Location: http://localhost/coSync/newfile.php");
-			
-			if ($ligne == false)
-					echo "Mauvais username ou mauvais mot de passe";
-			*/
+			if(connection($username,$password))
+				header("Location: http://localhost/coSync/account.php");
+			else echo "Mauvais username ou mauvais mot de passe";
 		}	
 	?>
 	

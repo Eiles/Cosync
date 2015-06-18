@@ -1,13 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.4.4
+-- version 3.5.1
 -- http://www.phpmyadmin.net
 --
--- Host: 127.0.0.1
--- Generation Time: Jun 11, 2015 at 10:23 AM
--- Server version: 5.6.22
--- PHP Version: 5.5.20
+-- Client: localhost
+-- Généré le: Jeu 18 Juin 2015 à 14:55
+-- Version du serveur: 5.5.24-log
+-- Version de PHP: 5.4.3
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
 
@@ -17,72 +17,43 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8 */;
 
 --
--- Database: `cosync`
+-- Base de données: `cosync`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `systems`
+-- Structure de la table `systems`
 --
 
 CREATE TABLE IF NOT EXISTS `systems` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `key` varchar(45) NOT NULL,
   `user_id` int(11) NOT NULL,
   `last_ip` varchar(45) DEFAULT NULL,
-  `is_master` tinyint(1) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `is_master` tinyint(1) NOT NULL,
+  `is_register` tinyint(1) DEFAULT '1',
+  PRIMARY KEY (`id`,`user_id`),
+  KEY `fk_systems_users_idx` (`user_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=6 ;
 
 --
--- Dumping data for table `systems`
+-- Contenu de la table `systems`
 --
 
-INSERT INTO `systems` (`id`, `key`, `user_id`, `last_ip`, `is_master`) VALUES
-(1, '1', 1, '127.0.0.1', 1);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `user`
---
-
-CREATE TABLE IF NOT EXISTS `user` (
-  `id` int(11) NOT NULL,
-  `name` varchar(45) DEFAULT NULL,
-  `password` varchar(45) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+INSERT INTO `systems` (`id`, `key`, `user_id`, `last_ip`, `is_master`, `is_register`) VALUES
+(1, '1', 1, '127.0.0.1', 1, 1),
+(1, 'ABC', 9, '255.255.255.255', 1, 1),
+(3, 'ABC', 9, '255.255.255.255', 1, 1),
+(4, 'ABD', 9, '1.1.1.1', 0, 1),
+(5, 'BLA', 1, '1.1.1.1', 0, 1);
 
 --
--- Dumping data for table `user`
---
-
-INSERT INTO `user` (`id`, `name`, `password`) VALUES
-(1, 'elie', 'password');
-
---
--- Indexes for dumped tables
+-- Contraintes pour les tables exportées
 --
 
 --
--- Indexes for table `systems`
---
-ALTER TABLE `systems`
-  ADD PRIMARY KEY (`id`,`user_id`),
-  ADD KEY `fk_systems_users_idx` (`user_id`);
-
---
--- Indexes for table `user`
---
-ALTER TABLE `user`
-  ADD PRIMARY KEY (`id`);
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `systems`
+-- Contraintes pour la table `systems`
 --
 ALTER TABLE `systems`
   ADD CONSTRAINT `fk_systems_users` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
