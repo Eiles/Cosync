@@ -7,7 +7,7 @@ import java.net.Socket;
 public class Coserver
         implements Runnable{
 
-    private int port = 80;
+    private int port = 7777;
     private int  count = 0;
 
 
@@ -18,7 +18,7 @@ public class Coserver
             System.out.println("MultipleSocketServer Initialized");
             while (true) {
                 Socket connection = socket1.accept();
-                Runnable runnable = new Cosocket(connection, ++count);
+                Runnable runnable = new Cosocket(connection, ++count, new CoSignal());
                 Thread thread = new Thread(runnable);
                 thread.start();
             }
