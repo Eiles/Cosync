@@ -1,5 +1,6 @@
+package CoSync.Models;
 
-
+import CoSync.Config;
 import difflib.*;
 
 import java.io.BufferedReader;
@@ -8,12 +9,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Cofile implements Config{
+public class Cofile implements Config {
     byte[] hash;
     String path;
     long modDate;
@@ -36,7 +35,7 @@ public class Cofile implements Config{
         this.path = path;
     }
     public String getAbsolutePath(){
-        return root+path;
+        return Config.root+path;
     }
 
     public boolean isSuppressed() {

@@ -1,7 +1,8 @@
-/**
+package CoSync; /**
  * Created by elie on 18/05/15.
  */
 import java.sql.*;
+
 public class CoDB {
 
         Connection c = null;
@@ -51,14 +52,14 @@ public class CoDB {
             }//end try
         }
 
-    /*public Cofile query(String sql) throws SQLException{
+    /*public CoSync.Models.Cofile query(String sql) throws SQLException{
         Statement stmt = c.createStatement();
-        Cofile ret=null;
+        CoSync.Models.Cofile ret=null;
         try{
             stmt = c.createStatement();
             ResultSet res=stmt.executeQuery(sql);
             if(res.next())
-                ret =new Cofile(res.getString("PATH"), res.getString("FILENAME"), res.getString("DATE"));
+                ret =new CoSync.Models.Cofile(res.getString("PATH"), res.getString("FILENAME"), res.getString("DATE"));
 
             //System.out.println("Query executed successfully");
         }catch(SQLException se){

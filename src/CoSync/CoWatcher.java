@@ -1,11 +1,16 @@
+package CoSync;
+
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.*;
-import static java.nio.file.StandardWatchEventKinds.*;
-import static java.nio.file.LinkOption.*;
-import java.nio.file.attribute.*;
-import java.io.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+
+import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
+import static java.nio.file.StandardWatchEventKinds.*;
 
 
 public class CoWatcher extends Thread{
@@ -19,7 +24,7 @@ public class CoWatcher extends Thread{
     /**
      * Constructeur
      */
-    CoWatcher(Path dir, boolean recursive,CoDB db) throws IOException {
+    CoWatcher(Path dir, boolean recursive, CoDB db) throws IOException {
         this.watcher = FileSystems.getDefault().newWatchService();
         this.keys = new HashMap();
         this.recursive = recursive;
@@ -196,7 +201,7 @@ public class CoWatcher extends Thread{
         }
     }
 
-    public static void check(Path file,CoDB db) throws ParseException, SQLException {
+    public static void check(Path file, CoDB db) throws ParseException, SQLException {
         cpt++;
         File fic=new File(file.toUri());
         String path= Paths.get(Config.root).relativize(file).toString();

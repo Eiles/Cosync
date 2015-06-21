@@ -1,8 +1,8 @@
+package CoSync.Models;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.json.simple.parser.JSONParser;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;

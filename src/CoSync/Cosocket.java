@@ -1,7 +1,7 @@
-import java.net.*;
+package CoSync;
+
 import java.io.*;
-import java.nio.Buffer;
-import java.util.*;
+import java.net.Socket;
 
 public class Cosocket implements Runnable {
 
@@ -114,11 +114,10 @@ public class Cosocket implements Runnable {
         int i=0;
         BufferedOutputStream bos = new BufferedOutputStream(connection.getOutputStream());
         DataOutputStream dos=new DataOutputStream(bos);
-        String process = "getDB";
+        String process = request;
         byte[] b = process.getBytes("UTF-8");
         dos.writeInt(b.length);
         System.out.println("Size sent : "+b.length);
-        dos.flush();
         dos.write(b);
         dos.flush();
         System.out.println("Request sent : "+process);
@@ -131,7 +130,6 @@ public class Cosocket implements Runnable {
         byte[] b = token.getBytes("UTF-8");
         dos.writeInt(b.length);
         System.out.println("Size sent : "+b.length);
-        dos.flush();
         dos.write(b);
         dos.flush();
         System.out.println("Request sent : "+token);

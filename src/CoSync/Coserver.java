@@ -1,3 +1,5 @@
+package CoSync;
+
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -7,7 +9,7 @@ import java.net.Socket;
 public class Coserver
         implements Runnable{
 
-    private int port = 80;
+    private int port = 8080;
     private int  count = 0;
 
 
