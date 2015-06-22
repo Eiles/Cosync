@@ -3,7 +3,7 @@
 	require_once 'user.php';
 	require_once 'systems.php';
 	displayHTMLHeader("Page utilisateur");
-	debutSession();
+	startSession();
 	deconnection("http://localhost/coSync/account.php");
 	
 	echo "Hello ".$_SESSION["username"]." tu t'es connecté à ".date('D, d M Y H:i:s',$_SESSION["arriver"]);
@@ -26,7 +26,7 @@
 			if($obj->is_register){
 				systems_button("Unregister");
 				if(isset($_POST["Unregister"])){
-					updateIsRegister($obj->id, 0);
+					updateSystemRegistration($obj->id, 0);
 					unset($_POST["Unregister"]);
 					unset($_POST["Register"]);
 					header("Location: http://localhost/coSync/account.php");
@@ -37,7 +37,7 @@
 			}else{
 				systems_button("Register");
 				if(isset($_POST["Register"])){
-					updateIsRegister($obj->id, 1);
+					updateSystemRegistration($obj->id, 1);
 					unset($_POST["Register"]);
 					unset($_POST["Unregister"]);
 					header("Location: http://localhost/coSync/account.php");

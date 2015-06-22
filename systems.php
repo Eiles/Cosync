@@ -30,7 +30,7 @@ function registerSystem($username,$password,$is_master){
     return json_encode(array('key'=>uniqid));
 }
 
-function updateIsRegister($id, $value){
+function updateSystemRegistration($id, $value){
 	$dbh = new PDO('mysql:host=127.0.0.1;dbname=cosync', 'root', 'toor');
 	$sql = "UPDATE `systems` SET `is_register` = ".$value." WHERE `id` = ".$id;
 	$dbh->query($sql);

@@ -1,5 +1,5 @@
 <?php
-function debutSession(){
+function startSession(){
 	session_start();
 	if(time()-$_SESSION["arriver"]>25*60){
 		session_destroy();
@@ -7,7 +7,7 @@ function debutSession(){
 	}
 }
 
-function verifSession(){
+function sessionTimmerVerification(){
 	if($_SESSION["job"]=="Eleve"||$_SESSION["job"]=="President"){
 		echo "Vous n'avez pas le droits d'être ici. Vous aller être redirigé sans voir ce message";
 		header("Location: http://localhost/projet_annuel/accueil/accueil.php");
