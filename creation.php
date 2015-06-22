@@ -20,7 +20,7 @@
 			echo "Le login est obligatoire !";
 		else if($password == "")
 			echo "Le mot de passe est obligatoire !";
-		else creationUser($username, $password);
+		else creation_user($username, $password);
 	}
 ?>
 

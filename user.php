@@ -24,7 +24,7 @@ function connection($username,$password){
 	return 0;	 
 }
 
-function creationUser($username, $password){
+function creation_user($username, $password){
 	$dbh = new PDO('mysql:host=127.0.0.1;dbname=cosync', 'root', 'toor');
 	$params = array(":u" => $username);
 	
