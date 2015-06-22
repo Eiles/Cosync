@@ -3,5 +3,3 @@ Regler le soucis des boutton register/unregister : (ils s'activent tous en même
 ?Ajouter l'option pour rajouter un system ?
 
 Faire évoluer l'interface Russian style
-
-camelCase, nom de variables en anglais et bien explicite
