@@ -1,7 +1,7 @@
 <?php
 	require 'tool.php';
 	displayHTMLHeader("Page utilisateur");
-	debutSession();
+	startSession();
 	deconnection("http://localhost/coSync/compte.php");
 	
 	echo "Hello".$_SESSION["id"]." tu t es connecte a ".$_SESSION["arriver"];
