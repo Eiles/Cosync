@@ -1,6 +1,7 @@
-<?php
+ï»¿<?php
 
 function connection($username,$password){
+	if($username == "" || $password == "") return false;
 	$dbh = new PDO('mysql:host=127.0.0.1;dbname=cosync', 'root', 'toor');
 	
 	$params = array(":u" => $username, ":p" => $password);
@@ -20,8 +21,7 @@ function connection($username,$password){
 		}
 		
 	}
-	
-	return 0;	 
+	return false;
 }
 
 function creationUser($username, $password){
@@ -33,29 +33,15 @@ function creationUser($username, $password){
 	if($statement && $statement->execute($params)){
 		$row = $statement->fetchALL();
 		if($row)
-			echo "Ce nom d'utulisateur est déjà utilisé. Merc d'en choisir un nouveau.";
+			echo "Ce nom d'utilisateur est dÃ©jÃ  utilisÃ©. Merci d'en choisir un nouveau.";
 		else{
 			$params = array(":u" => $username, ":p" => $password);
 			$statement = $dbh->prepare("INSERT INTO `user` (`name`, `password`) VALUES (:u, :p)");
 			if($statement && $statement->execute($params)){
-				echo "Insertion réussi";
+				echo "Insertion rÃ©ussi";
 			}
-			else echo "Erreur de requête";
+			else echo "Erreur de requÃªte";
 		}
 	}
-	/*
-	
-	if($ligne[0]==$username) echo "Ce nom d'utilisateur et deja utilise. Merci d'en choisir un nouveau";
-	
-	if ($ligne == false){
-		$statement = $dbh->prepare("INSERT INTO `user` (`name`, `password`) VALUES (:u, :p");
-		
-		$query="INSERT INTO `user` (`name`, `password`) 
-		VALUES ('$username', '$password')";
-		executeQuery($query);
-		echo "Creation de compte reussi : '$username'";
-	}
-	*/
 }
-
 ?>

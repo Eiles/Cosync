@@ -2,21 +2,20 @@
 	require_once 'tool.php';
 	require_once 'user.php';
 	displayHTMLHeader("Accueil CoSync");
-	
 	session_start();
 ?>
-	Bienvenue !!
+	<h1>Bienvenue !!</h1>
 	<br>
-	Connectez vous :
+	<h2>Connectez vous :</h2>
 	<form method="post" action="accueil.php">
-		username <input type="text" name="username">
-		Mot de passe <input type="password" name="password">
-		<input type="submit" value="Entrer">
+		<strong>username</strong> <input type="text" name="username">
+		<strong>Mot de passe</strong> <input type="password" name="password">
+		<input class="btn btn-primary" type="submit" value="Connection">
 	</form>
 	<br><br>
 	<form method="post" action="creation.php">
-		Vous êtes nouveau ?
-		<input type="submit" value="Créér un compte">
+		<strong>Vous etes nouveau ?</strong>
+		<input class="btn btn-primary" type="submit" value="Creer un compte">
 	</form>
 	<?php
 		if (isset($_POST["username"]) && isset($_POST["password"])){
