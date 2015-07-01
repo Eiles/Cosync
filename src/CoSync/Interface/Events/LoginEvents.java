@@ -1,6 +1,6 @@
 package CoSync.Interface.Events;
 
-import CoSync.Interface.LoginMenu;
+import CoSync.Interface.CoLoginMenu;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,9 +10,9 @@ import java.awt.event.ActionListener;
  */
 public class LoginEvents {
 
-    private LoginMenu loginMenu;
+    private CoLoginMenu loginMenu;
 
-    public LoginEvents(LoginMenu loginMenu) {
+    public LoginEvents(CoLoginMenu loginMenu) {
         this.loginMenu =loginMenu;
     }
 

@@ -20,14 +20,17 @@ public class CoWatcher extends Thread{
     private final boolean recursive;
     private boolean trace = true;
     private CoDB db;
+    private CoController coController;
 
     /**
      * Constructeur
      */
-    CoWatcher(Path dir, boolean recursive, CoDB db) throws IOException {
+    CoWatcher(Path dir, boolean recursive, CoController coController) throws IOException {
         this.watcher = FileSystems.getDefault().newWatchService();
         this.keys = new HashMap();
         this.recursive = recursive;
+        this.coController = coController;
+        this.db = coController.getCoDB();
 
         if (recursive) {
             System.out.format("Scanning %s ...\n", dir);
@@ -103,7 +106,6 @@ public class CoWatcher extends Thread{
             for (WatchEvent event: key.pollEvents()) {
 
                 WatchEvent.Kind kind = event.kind();
-
                 
                 if (kind == OVERFLOW) {
                     continue;
@@ -123,6 +125,7 @@ public class CoWatcher extends Thread{
                             System.out.println(path);
                             System.out.println("UPDATE FILES SET SUPPRESSED=1" + " ,MODIFIEDAT=" + System.currentTimeMillis() + "  WHERE PATH LIKE '" + path + "%'");
                             db.update("UPDATE FILES SET SUPPRESSED=1" + " ,MODIFIEDAT=" + System.currentTimeMillis() + "  WHERE PATH LIKE '" + path + "%'");
+                            coController.addEvent(event.kind().name(),child.getFileName().toString());
                         } catch (Exception se) {
                             System.out.println(se);
                         }
@@ -134,6 +137,7 @@ public class CoWatcher extends Thread{
                             System.out.println("Supprimé le " + datesql);
                             db.update("UPDATE FILES SET SUPPRESSED=1" + " ,MODIFIEDAT=" + System.currentTimeMillis() + "  WHERE PATH LIKE '" + path + "/%'");
                             db.update("UPDATE FILES SET SUPPRESSED=1" + " , MODIFIEDAT=" + System.currentTimeMillis() + "  WHERE PATH='" + path + "'");
+                            coController.addEvent(event.kind().name(),child.getFileName().toString());
                         } catch (Exception se) {
                             System.out.println(se);
                         }
@@ -145,6 +149,7 @@ public class CoWatcher extends Thread{
                         try {
                             checkFolder(child,db);
                             db.update("UPDATE FILES SET SUPPRESSED=1"+" , MODIFIEDAT="+System.currentTimeMillis()+"  WHERE PATH LIKE '"+child+"%'");
+                            coController.addEvent(event.kind().name(),child.getFileName().toString());
                         }catch (Exception se){
                             System.out.println(se);
                         }
@@ -155,11 +160,11 @@ public class CoWatcher extends Thread{
                             long datesql=new File(child.toUri()).lastModified();
                             System.out.println("Modifié le "+datesql);
                             db.update("UPDATE FILES SET DATE="+datesql+", MODIFIEDAT="+System.currentTimeMillis()+" WHERE PATH='"+path+"'");
+                            coController.addEvent(event.kind().name(),child.getFileName().toString());
                         }catch (Exception se){
                             System.out.println(se);
                         }
                     }
-
                 }
 
                 // Si creation
@@ -178,6 +183,8 @@ public class CoWatcher extends Thread{
                                 long datesql=new File(child.toUri()).lastModified();
                                 System.out.println("Créé le "+datesql);
                                 db.update("INSERT INTO FILES(PATH,DATE,SUPPRESSED,MODIFIEDAT) VALUES ('"+path+"',"+datesql+",0,"+System.currentTimeMillis()+")");
+
+                                coController.addEvent(event.kind().name(),child.getFileName().toString());
                             }catch (Exception se){
                                 System.out.println(se);
                             }

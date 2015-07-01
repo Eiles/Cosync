@@ -8,7 +8,7 @@ import java.awt.*;
 /**
  * Created by Alban on 16/06/2015.
  */
-public class LoginMenu extends JFrame {
+public class CoLoginMenu extends CoInterface {
 
     private boolean isLogged;
 
@@ -23,7 +23,7 @@ public class LoginMenu extends JFrame {
     private JButton logButton;
     private JButton cancelButton;
 
-    public LoginMenu() {
+    public CoLoginMenu() {
 
         isLogged = false;
         loginEvents = new LoginEvents(this);
@@ -110,5 +110,10 @@ public class LoginMenu extends JFrame {
 
     public void setLogged(boolean isLogged) {
         this.isLogged = isLogged;
+    }
+
+    @Override
+    public void update() {
+
     }
 }
