@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Client: localhost
--- Généré le: Jeu 18 Juin 2015 à 14:55
+-- Généré le: Mer 01 Juillet 2015 à 10:12
 -- Version du serveur: 5.5.24-log
 -- Version de PHP: 5.4.3
 
@@ -42,9 +42,9 @@ CREATE TABLE IF NOT EXISTS `systems` (
 --
 
 INSERT INTO `systems` (`id`, `key`, `user_id`, `last_ip`, `is_master`, `is_register`) VALUES
-(1, '1', 1, '127.0.0.1', 1, 1),
-(1, 'ABC', 9, '255.255.255.255', 1, 1),
-(3, 'ABC', 9, '255.255.255.255', 1, 1),
+(1, '1', 1, '127.0.0.1', 1, 0),
+(1, 'ABC', 9, '255.255.255.255', 1, 0),
+(3, 'ABC', 9, '255.255.255.255', 1, 0),
 (4, 'ABD', 9, '1.1.1.1', 0, 1),
 (5, 'BLA', 1, '1.1.1.1', 0, 1);
 
