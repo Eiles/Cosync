@@ -1,5 +1,6 @@
 ?Ajouter l'option pour rajouter un system ?
 
-EN COURS :Faire évoluer l'interface Russian style
+EN COURS :Faire Ã©voluer l'interface Russian style
 	- Table a modifier
 	- Background
+commentaires !
