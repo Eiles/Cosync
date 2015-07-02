@@ -7,13 +7,13 @@ import java.util.*;
 public class Cosocket implements Runnable {
 
     private Socket connection;
-    private int ID;
+    private int id;
     private boolean auth;
     private CoSignal sharedSignal;
     private Cofile cofile;
     public Cosocket(Socket s, int i, CoSignal signal) {
         this.connection = s;
-        this.ID = i;
+        this.id = i;
         this.auth=false;
         this.sharedSignal=signal;
     }
@@ -269,5 +269,9 @@ public class Cosocket implements Runnable {
         }
         else
             sendRequest("hasFileResponse: "+path);
+    }
+
+    public Socket getConnection(){
+        return connection;
     }
 }

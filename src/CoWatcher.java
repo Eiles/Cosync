@@ -15,6 +15,7 @@ public class CoWatcher extends Thread{
     private final boolean recursive;
     private boolean trace = true;
     private CoDB db;
+    private boolean active=false;
 
     /**
      * Constructeur
@@ -111,74 +112,78 @@ public class CoWatcher extends Thread{
 
                 // Si suppression
                 if(kind==ENTRY_DELETE){
-                    if (Files.isDirectory(child, NOFOLLOW_LINKS)) {
-                        try {
-                            String path = Paths.get(Config.root).relativize(child).toString();
-                            this.registerAll(child.getParent());
-                            System.out.println(path);
-                            System.out.println("UPDATE FILES SET SUPPRESSED=1" + " ,MODIFIEDAT=" + System.currentTimeMillis() + "  WHERE PATH LIKE '" + path + "%'");
-                            db.update("UPDATE FILES SET SUPPRESSED=1" + " ,MODIFIEDAT=" + System.currentTimeMillis() + "  WHERE PATH LIKE '" + path + "%'");
-                        } catch (Exception se) {
-                            System.out.println(se);
-                        }
-                    }else {
-                        try {
-                            System.out.format("%s: %s\n", event.kind().name(), child.getFileName());
-                            String path = Paths.get(Config.root).relativize(child).toString();
-                            long datesql = new File(child.toUri()).lastModified();
-                            System.out.println("Supprimé le " + datesql);
-                            db.update("UPDATE FILES SET SUPPRESSED=1" + " ,MODIFIEDAT=" + System.currentTimeMillis() + "  WHERE PATH LIKE '" + path + "/%'");
-                            db.update("UPDATE FILES SET SUPPRESSED=1" + " , MODIFIEDAT=" + System.currentTimeMillis() + "  WHERE PATH='" + path + "'");
-                        } catch (Exception se) {
-                            System.out.println(se);
+                    if(active) {
+                        if (Files.isDirectory(child, NOFOLLOW_LINKS)) {
+                            try {
+                                String path = Paths.get(Config.root).relativize(child).toString();
+                                this.registerAll(child.getParent());
+                                System.out.println(path);
+                                System.out.println("UPDATE FILES SET SUPPRESSED=1" + " ,MODIFIEDAT=" + System.currentTimeMillis() + "  WHERE PATH LIKE '" + path + "%'");
+                                db.update("UPDATE FILES SET SUPPRESSED=1" + " ,MODIFIEDAT=" + System.currentTimeMillis() + "  WHERE PATH LIKE '" + path + "%'");
+                            } catch (Exception se) {
+                                System.out.println(se);
+                            }
+                        } else {
+                            try {
+                                System.out.format("%s: %s\n", event.kind().name(), child.getFileName());
+                                String path = Paths.get(Config.root).relativize(child).toString();
+                                long datesql = new File(child.toUri()).lastModified();
+                                System.out.println("Supprimé le " + datesql);
+                                db.update("UPDATE FILES SET SUPPRESSED=1" + " ,MODIFIEDAT=" + System.currentTimeMillis() + "  WHERE PATH LIKE '" + path + "/%'");
+                                db.update("UPDATE FILES SET SUPPRESSED=1" + " , MODIFIEDAT=" + System.currentTimeMillis() + "  WHERE PATH='" + path + "'");
+                            } catch (Exception se) {
+                                System.out.println(se);
+                            }
                         }
                     }
                 }
 
                 if(kind==ENTRY_MODIFY){
-                    if (Files.isDirectory(child, NOFOLLOW_LINKS)) {
-                        try {
-                            checkFolder(child,db);
-                            db.update("UPDATE FILES SET SUPPRESSED=1"+" , MODIFIEDAT="+System.currentTimeMillis()+"  WHERE PATH LIKE '"+child+"%'");
-                        }catch (Exception se){
-                            System.out.println(se);
-                        }
-                    }else{
-                        try {
-                            System.out.format("%s: %s\n", event.kind().name(),child.getFileName());
-                            String path=Paths.get(Config.root).relativize(child).toString();
-                            long datesql=new File(child.toUri()).lastModified();
-                            System.out.println("Modifié le "+datesql);
-                            db.update("UPDATE FILES SET DATE="+datesql+", MODIFIEDAT="+System.currentTimeMillis()+" WHERE PATH='"+path+"'");
-                        }catch (Exception se){
-                            System.out.println(se);
+                    if(active) {
+                        if (Files.isDirectory(child, NOFOLLOW_LINKS)) {
+                            try {
+                                checkFolder(child, db);
+                                db.update("UPDATE FILES SET SUPPRESSED=1" + " , MODIFIEDAT=" + System.currentTimeMillis() + "  WHERE PATH LIKE '" + child + "%'");
+                            } catch (Exception se) {
+                                System.out.println(se);
+                            }
+                        } else {
+                            try {
+                                System.out.format("%s: %s\n", event.kind().name(), child.getFileName());
+                                String path = Paths.get(Config.root).relativize(child).toString();
+                                long datesql = new File(child.toUri()).lastModified();
+                                System.out.println("Modifié le " + datesql);
+                                db.update("UPDATE FILES SET DATE=" + datesql + ", MODIFIEDAT=" + System.currentTimeMillis() + " WHERE PATH='" + path + "'");
+                            } catch (Exception se) {
+                                System.out.println(se);
+                            }
                         }
                     }
-
                 }
 
                 // Si creation
                 if (kind == ENTRY_CREATE) {
-                    try {
-                        //On surveille les nouveaux dossiers
-                        if (Files.isDirectory(child, NOFOLLOW_LINKS)) {
-                            checkFolder(child,db);
-                            registerAll(child);
-                        }
-                        else{
-                            //On enregistre en base les nouveaux fichiers
-                            try {
-                                System.out.format("%s: %s\n", event.kind().name(),child.getFileName());
-                                String path=Paths.get(Config.root).relativize(child).toString();
-                                long datesql=new File(child.toUri()).lastModified();
-                                System.out.println("Créé le "+datesql);
-                                db.update("INSERT INTO FILES(PATH,DATE,SUPPRESSED,MODIFIEDAT) VALUES ('"+path+"',"+datesql+",0,"+System.currentTimeMillis()+")");
-                            }catch (Exception se){
-                                System.out.println(se);
+                    if(active) {
+                        try {
+                            //On surveille les nouveaux dossiers
+                            if (Files.isDirectory(child, NOFOLLOW_LINKS)) {
+                                checkFolder(child, db);
+                                registerAll(child);
+                            } else {
+                                //On enregistre en base les nouveaux fichiers
+                                try {
+                                    System.out.format("%s: %s\n", event.kind().name(), child.getFileName());
+                                    String path = Paths.get(Config.root).relativize(child).toString();
+                                    long datesql = new File(child.toUri()).lastModified();
+                                    System.out.println("Créé le " + datesql);
+                                    db.update("INSERT INTO FILES(PATH,DATE,SUPPRESSED,MODIFIEDAT) VALUES ('" + path + "'," + datesql + ",0," + System.currentTimeMillis() + ")");
+                                } catch (Exception se) {
+                                    System.out.println(se);
+                                }
                             }
+                        } catch (IOException x) {
+
                         }
-                    } catch (IOException x) {
-                        
                     }
                 }
             }

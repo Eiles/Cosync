@@ -16,7 +16,7 @@ import java.util.List;
 public class Couser {
     String name;
     String password;
-    List<Cosystem> Cosystems;
+    List<Cosystem> cosystems;
 
     public Couser(String name, String password)
     {
@@ -45,11 +45,11 @@ public class Couser {
     }
 
     public List<Cosystem> getCosystems() {
-        return Cosystems;
+        return this.cosystems;
     }
 
     public void setCosystems(List<Cosystem> cosystems) {
-        Cosystems = cosystems;
+        this.cosystems = cosystems;
     }
 
 
