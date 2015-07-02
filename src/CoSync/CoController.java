@@ -68,6 +68,7 @@ public class CoController extends Thread {
         loader = new CoLoader();
 
         try {
+            sleep(3000);
             if(!initApp()) {
                 throw new Exception("Erreur Initialisation");
             }
