@@ -63,12 +63,11 @@ public class CoController extends Thread {
     }
 
     private void proceed() throws InterruptedException, IOException {
-        views.put("login", new CoLoginMenu());
+        views.put("login", new CoLoginMenu(this));
 
         loader = new CoLoader();
 
         try {
-            sleep(3000);
             if(!initApp()) {
                 throw new Exception("Erreur Initialisation");
             }
@@ -76,22 +75,14 @@ public class CoController extends Thread {
             while (true) {
 
                 sleep(0);
-                if (views.get("login") != null) {
-                    if(((CoLoginMenu)views.get("login")).isLogged()) {
-                        // Récupération des informations de l'utilisateur
-                        String error;
-                        user = new Couser(((CoLoginMenu) views.get("login")).getLogin().getText(), String.valueOf(((CoLoginMenu) views.get("login")).getPassword().getPassword()));
+                if (null == user) {
+                    // Récupération des informations de l'utilisateur
+                    String error;
 
-                        ArrayList<Cosystem> systems = new ArrayList<>();
-                        systems.add(new Cosystem("192.168.1.1", "000", "My PC"));
-                        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
-                        user.setCosystems(systems);
-
-                        switchView("appli");
-                    }
+                    switchView("login");
                 }
             }
-        } catch (Exception e) {
+    } catch (Exception e) {
             loader.updateLoaderText(e.getMessage());
             loader.setTitle("Erreur");
             loader.setVisible(true);
@@ -101,15 +92,15 @@ public class CoController extends Thread {
 
     public void addEvent(String type, String message) {
         events.push(new CoEvent(type, message));
-        if(views.get("appli") != null) {
-            ((CoMainMenu)views.get("appli")).updateListEvents(events);
+        if(views.get("main") != null) {
+            ((CoMainMenu)views.get("main")).updateListEvents(events);
         }
     }
 
     public void switchView(String view) throws InterruptedException {
         try {
-            if(!views.containsKey(view) && view.equals("appli"))       { views.put("appli",  new CoMainMenu(this)); }
-            if(!views.containsKey(view) && view.equals("managefiles")) { views.put("managefiles",  new CoFileMenu(this)); }
+            if(!views.containsKey(view) && view.equals("main"))       { views.put("main",  new CoMainMenu(this)); }
+            else if(!views.containsKey(view) && view.equals("managefiles")) { views.put("managefiles",  new CoFileMenu(this)); }
 
             if(!view.equals(actualView) ) {
                 System.out.println(actualView +" => "+view);
@@ -120,13 +111,26 @@ public class CoController extends Thread {
                 views.get(view).update();
                 actualView = view;
 
-                sleep(1000);
                 loader.setLoading(false);
             }
 
         } catch (Exception e) {
             throw e;
         }
+    }
+
+    public void logIn(String name, String password) throws InterruptedException {
+
+        //TODO: Vérification et récupération des données du User
+        Couser user = new Couser(name, password);
+        this.user = user;
+
+        ArrayList<Cosystem> systems = new ArrayList<>();
+        systems.add(new Cosystem("192.168.1.1", "000", "My PC"));
+        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
+        user.setCosystems(systems);
+
+        switchView("main");
     }
 
     private Boolean initApp() {

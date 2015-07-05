@@ -19,21 +19,22 @@ import java.util.Stack;
  */
 public class CoMainMenu extends CoInterface{
 
-    private CoController controller;
     private Dimension dimInterface;
 
     private JPanel center;
     private JPanel east;
     private JPanel south;
 
-    private JPanel eventsPanel;
+    private JScrollPane eventsPanel;
+    private Box evList;
     private JToolBar toolBar;
 
     private Label header;
 
     public CoMainMenu(CoController coController) {
 
-        controller = coController;
+        super(coController);
+
         getContentPane().setLayout(new BorderLayout());
         addWindowListener(new InterfaceEvents());
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -45,8 +46,6 @@ public class CoMainMenu extends CoInterface{
         setCenter();
         setEast();
         setSouth();
-
-        setVisible(true);
     }
 
     private void setCenter() {
@@ -56,8 +55,10 @@ public class CoMainMenu extends CoInterface{
         header = new Label();
         center.add(header, BorderLayout.NORTH);
 
-        eventsPanel = new JPanel();
-        eventsPanel.add(new Label("Liste des modifications de fichiers"));
+        evList = Box.createVerticalBox();
+        evList.add(new Label("Liste des modifications de fichiers"));
+        eventsPanel = new JScrollPane(evList);
+
         center.add(eventsPanel, BorderLayout.CENTER);
 
         add(center, BorderLayout.CENTER);
@@ -153,18 +154,17 @@ public class CoMainMenu extends CoInterface{
     public void updateListEvents(Stack<CoEvent> events) {
         System.out.println("UPDATE LIST EVENTS");
         System.out.println(events.size());
-        eventsPanel.removeAll();
 
-        Box evList = Box.createVerticalBox();
+        evList.removeAll();
+
         for(CoEvent event: events) {
-            System.out.println("message => "+event.getMessage());
             Box ev = Box.createVerticalBox();
-            ev.setAlignmentX(RIGHT_ALIGNMENT);
+            ev.setAlignmentX(LEFT_ALIGNMENT);
             ev.setAlignmentY(TOP_ALIGNMENT);
-            ev.setBorder(new EmptyBorder(0,3,5,5));
+            ev.setBorder(new EmptyBorder(0,3,5,10));
             ev.setBackground(Color.WHITE);
 
-            ev.setPreferredSize(new Dimension(center.getWidth(), center.getHeight() / 10 - 10));
+            ev.setMaximumSize(new Dimension(center.getWidth() - 20, center.getHeight() / 10 - 10));
 
             Label type = new Label(event.getType());
             type.setAlignment(Label.RIGHT);
@@ -178,7 +178,6 @@ public class CoMainMenu extends CoInterface{
         }
 
         evList.add(Box.createVerticalGlue());
-        eventsPanel.add(evList);
         eventsPanel.revalidate();
     }
 

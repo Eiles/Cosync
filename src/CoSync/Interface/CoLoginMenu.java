@@ -1,5 +1,6 @@
 package CoSync.Interface;
 
+import CoSync.CoController;
 import CoSync.Interface.Events.LoginEvents;
 
 import javax.swing.*;
@@ -23,10 +24,11 @@ public class CoLoginMenu extends CoInterface {
     private JButton logButton;
     private JButton cancelButton;
 
-    public CoLoginMenu() {
+    public CoLoginMenu(CoController controller) {
+        super(controller);
 
         isLogged = false;
-        loginEvents = new LoginEvents(this);
+        loginEvents = new LoginEvents(controller, this);
         dimension = new Dimension(400, 300);
         setLayout(new BorderLayout());
 

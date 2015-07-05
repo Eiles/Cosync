@@ -1,5 +1,6 @@
 package CoSync.Interface.Events;
 
+import CoSync.CoController;
 import CoSync.Interface.CoLoginMenu;
 
 import java.awt.event.ActionEvent;
@@ -11,10 +12,13 @@ import java.awt.event.ActionListener;
 public class LoginEvents {
 
     private CoLoginMenu loginMenu;
+    private CoController controller;
 
-    public LoginEvents(CoLoginMenu loginMenu) {
-        this.loginMenu =loginMenu;
+    public LoginEvents(CoController controller, CoLoginMenu loginMenu) {
+        this.controller = controller;
+        this.loginMenu = loginMenu;
     }
+
 
     private class LoginButtonEvents implements ActionListener {
 
@@ -22,7 +26,11 @@ public class LoginEvents {
         public void actionPerformed(ActionEvent e) {
             if((loginMenu.getLogin().getText().length() > 0) && (loginMenu.getPassword().getPassword().length > 0)) {
                 //Vérification des données saisies
-                loginMenu.setLogged(true);
+                try {
+                    controller.logIn(loginMenu.getLogin().getText(), loginMenu.getPassword().getPassword().toString());
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
             }
         }
     }

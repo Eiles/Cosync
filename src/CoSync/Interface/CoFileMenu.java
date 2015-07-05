@@ -23,7 +23,6 @@ import java.util.Stack;
  */
 public class CoFileMenu extends CoInterface {
 
-    private CoController controller;
     private Dimension dimInterface;
 
     private JPanel center;
@@ -37,7 +36,8 @@ public class CoFileMenu extends CoInterface {
 
     public CoFileMenu(CoController coController) {
 
-        controller = coController;
+        super(coController);
+
         getContentPane().setLayout(new BorderLayout());
         addWindowListener(new InterfaceEvents());
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -47,8 +47,7 @@ public class CoFileMenu extends CoInterface {
         setTitle("Gestion du fichier");
 
         setCenter();
-
-        setVisible(true);
+        setSouth();
     }
 
     private void setCenter() {
@@ -63,6 +62,43 @@ public class CoFileMenu extends CoInterface {
         center.add(eventsPanel, BorderLayout.CENTER);
 
         add(center, BorderLayout.CENTER);
+    }
+
+    private void setSouth() {
+        south = new JPanel();
+        south.setLayout(new BoxLayout(south, BoxLayout.X_AXIS));
+        south.setPreferredSize(new Dimension(dimInterface.width,  dimInterface.height / 20));
+
+        final JButton quit = new JButton("Quitter");
+        quit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+        quit.setAlignmentX(RIGHT_ALIGNMENT);
+
+        final JButton mainMenu = new JButton("Menu principal");
+        mainMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    controller.switchView("main");
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
+        mainMenu.setAlignmentX(LEFT_ALIGNMENT);
+
+        toolBar = new JToolBar();
+        toolBar.add(Box.createHorizontalGlue());
+        toolBar.add(mainMenu);
+        toolBar.add(quit);
+
+        south.add(toolBar);
+
+        add(south, BorderLayout.SOUTH);
     }
 
     @Override
