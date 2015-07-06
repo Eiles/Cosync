@@ -67,7 +67,7 @@ public class CoMainMenu extends CoInterface{
     private void setEast() {
         east = new JPanel();
         east.setBorder(new LineBorder(Color.black));
-        east.setPreferredSize(new Dimension(dimInterface.width / 5,  dimInterface.height));
+        east.setPreferredSize(new Dimension(dimInterface.width / 5, dimInterface.height));
 
         add(east, BorderLayout.EAST);
     }
@@ -132,7 +132,7 @@ public class CoMainMenu extends CoInterface{
             sys.setBorder(new EmptyBorder(0,3,5,5));
             sys.setBackground(Color.WHITE);
 
-            sys.setPreferredSize(new Dimension(east.getWidth(), east.getHeight() / 10 - 10));
+            sys.setPreferredSize(new Dimension(east.getWidth() - 4, east.getHeight() / 10 - 10));
 
             Label name = new Label(system.getName());
             name.setAlignment(Label.RIGHT);
@@ -146,7 +146,10 @@ public class CoMainMenu extends CoInterface{
         }
 
         sysBox.add(Box.createVerticalGlue());
-        east.add(sysBox);
+
+        JScrollPane scroll = new JScrollPane(sysBox);
+        scroll.setBorder(new EmptyBorder(1,1,1,1));
+        east.add(scroll);
 
         east.revalidate();
     }
