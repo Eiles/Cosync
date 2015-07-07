@@ -5,18 +5,15 @@ package CoSync.Interface;
  */
 
 import CoSync.CoController;
+import CoSync.Config;
 import CoSync.Interface.Events.InterfaceEvents;
-import CoSync.Models.CoEvent;
-import CoSync.Models.Cosystem;
-import CoSync.Models.Couser;
+import CoSync.Models.CoFileTreeModel;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Stack;
+import java.io.File;
 
 /**
  * Created by Alban on 15/06/2015.
@@ -25,12 +22,16 @@ public class CoFileMenu extends CoInterface {
 
     private Dimension dimInterface;
 
+    private JPanel north;
     private JPanel center;
     private JPanel east;
     private JPanel south;
 
-    private JPanel eventsPanel;
+    private JPanel filesPanel;
+    private JTree filesTree;
+
     private JToolBar toolBar;
+    private JToolBar fileBar;
 
     private Label header;
 
@@ -46,8 +47,62 @@ public class CoFileMenu extends CoInterface {
         setSize(dimInterface);
         setTitle("Gestion du fichier");
 
+        setNorth();
         setCenter();
         setSouth();
+    }
+
+    private void setNorth() {
+        north = new JPanel();
+        north.setLayout(new BorderLayout());
+
+        final JButton add = new JButton("Ajout");
+        add.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    controller.logOut();
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
+        add.setAlignmentX(RIGHT_ALIGNMENT);
+
+        final JButton edit = new JButton("Edition");
+        edit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    controller.switchView("main");
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
+        edit.setAlignmentX(LEFT_ALIGNMENT);
+
+        final JButton delete = new JButton("Suppression");
+        edit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    controller.switchView("main");
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
+        edit.setAlignmentX(LEFT_ALIGNMENT);
+
+
+        fileBar = new JToolBar();
+        fileBar.add(add);
+        fileBar.add(delete);
+        fileBar.add(edit);
+
+        north.add(fileBar);
+        add(north, BorderLayout.NORTH);
     }
 
     private void setCenter() {
@@ -57,9 +112,18 @@ public class CoFileMenu extends CoInterface {
         header = new Label();
         center.add(header, BorderLayout.NORTH);
 
-        eventsPanel = new JPanel();
-        eventsPanel.add(new Label("Events Panel"));
-        center.add(eventsPanel, BorderLayout.CENTER);
+        filesPanel = new JPanel();
+
+        File root = new File(Config.root);
+        CoFileTreeModel model = new CoFileTreeModel(root);
+
+        filesPanel.add(new Label("Events Panel"));
+
+        filesTree = new JTree();
+        filesTree.setModel(model);
+
+        filesTree.clearSelection();
+        center.add(filesTree, BorderLayout.CENTER);
 
         add(center, BorderLayout.CENTER);
     }
@@ -69,11 +133,15 @@ public class CoFileMenu extends CoInterface {
         south.setLayout(new BoxLayout(south, BoxLayout.X_AXIS));
         south.setPreferredSize(new Dimension(dimInterface.width,  dimInterface.height / 20));
 
-        final JButton quit = new JButton("Quitter");
+        final JButton quit = new JButton("Déconnexion");
         quit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                try {
+                    controller.logOut();
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
             }
         });
         quit.setAlignmentX(RIGHT_ALIGNMENT);
@@ -92,8 +160,8 @@ public class CoFileMenu extends CoInterface {
         mainMenu.setAlignmentX(LEFT_ALIGNMENT);
 
         toolBar = new JToolBar();
-        toolBar.add(Box.createHorizontalGlue());
         toolBar.add(mainMenu);
+        toolBar.add(Box.createHorizontalGlue());
         toolBar.add(quit);
 
         south.add(toolBar);

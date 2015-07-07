@@ -87,11 +87,15 @@ public class CoMainMenu extends CoInterface{
         south.setLayout(new BoxLayout(south, BoxLayout.X_AXIS));
         south.setPreferredSize(new Dimension(dimInterface.width,  dimInterface.height / 20));
 
-        final JButton quit = new JButton("Quitter");
+        final JButton quit = new JButton("Déconnexion");
         quit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                try {
+                    controller.logOut();
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
             }
         });
         quit.setAlignmentX(RIGHT_ALIGNMENT);
