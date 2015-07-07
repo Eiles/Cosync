@@ -41,6 +41,13 @@ public class CoController extends Thread {
     public void setUser(Couser user) {
         this.user = user;
     }
+    public Stack<CoEvent> getEvents() {
+        return events;
+    }
+
+    public void setEvents(Stack<CoEvent> events) {
+        this.events = events;
+    }
 
     public CoController() throws SQLException, IOException {
         Path dir = new File(Config.root).toPath();
@@ -127,22 +134,6 @@ public class CoController extends Thread {
 
         ArrayList<Cosystem> systems = new ArrayList<>();
         systems.add(new Cosystem("192.168.1.1", "000", "My PC"));
-        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
-        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
-        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
-        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
-        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
-        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
-        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
-        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
-        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
-        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
-        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
-        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
-        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
-        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
-        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
-        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
         systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
         user.setCosystems(systems);
 

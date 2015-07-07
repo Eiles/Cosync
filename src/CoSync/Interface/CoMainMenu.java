@@ -42,13 +42,13 @@ public class CoMainMenu extends CoInterface{
         addWindowListener(new InterfaceEvents());
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
-        dimInterface = new Dimension(1280, 720);
+        dimInterface = new Dimension(800, 600);
         setSize(dimInterface);
         setTitle("CoSync");
 
         setCenter();
-        setEast();
         setSouth();
+        setEast();
     }
 
     private void setCenter() {
@@ -69,14 +69,16 @@ public class CoMainMenu extends CoInterface{
 
     private void setEast() {
         east = new JPanel();
-        east.setBorder(new LineBorder(Color.black));
-        east.setPreferredSize(new Dimension(dimInterface.width / 5, dimInterface.height));
+        east.setLayout(new BorderLayout());
+        east.setPreferredSize(new Dimension(dimInterface.width / 5, dimInterface.height - south.getHeight()));
+
+        east.add(new JLabel("Mes Systèmes"), BorderLayout.NORTH);
+        east.setBorder(new EmptyBorder(0, 0, 0, 0));
 
         sysList = Box.createVerticalBox();
         sysPanel = new JScrollPane(sysList);
-        sysPanel.setBorder(new EmptyBorder(1,1,1,1));
 
-        east.add(sysPanel);
+        east.add(sysPanel, BorderLayout.CENTER);
         add(east, BorderLayout.EAST);
     }
 
@@ -135,13 +137,13 @@ public class CoMainMenu extends CoInterface{
             Box sys = Box.createVerticalBox();
             sys.setAlignmentX(RIGHT_ALIGNMENT);
             sys.setAlignmentY(TOP_ALIGNMENT);
-            sys.setBorder(new EmptyBorder(0,3,5,10));
             sys.setBackground(Color.WHITE);
+            sys.setBorder(new EmptyBorder(0,3,5,5));
 
-            sys.setMaximumSize(new Dimension(east.getWidth(), east.getHeight() / 10 - 10));
+            sys.setMaximumSize(new Dimension((int) east.getWidth() - 10, (int) (east.getHeight() / 5 - 10)));
 
             Label name = new Label(system.getName());
-            name.setAlignment(Label.RIGHT);
+            name.setAlignment(Label.LEFT);
             sys.add(name);
 
             Label ip = new Label(system.getIp());
@@ -155,6 +157,7 @@ public class CoMainMenu extends CoInterface{
         east.revalidate();
     }
 
+
     public void updateListEvents(Stack<CoEvent> events) {
         System.out.println("UPDATE LIST EVENTS");
         System.out.println(events.size());
@@ -165,10 +168,10 @@ public class CoMainMenu extends CoInterface{
             Box ev = Box.createVerticalBox();
             ev.setAlignmentX(LEFT_ALIGNMENT);
             ev.setAlignmentY(TOP_ALIGNMENT);
-            ev.setBorder(new EmptyBorder(0,3,5,10));
+            ev.setBorder(new EmptyBorder(0,3,5,5));
             ev.setBackground(Color.WHITE);
 
-            ev.setMaximumSize(new Dimension(center.getWidth() - 20, center.getHeight() / 10 - 10));
+            ev.setMaximumSize(new Dimension(evList.getWidth(), evList.getHeight() / 10));
 
             Label type = new Label(event.getType());
             type.setAlignment(Label.RIGHT);
@@ -188,6 +191,7 @@ public class CoMainMenu extends CoInterface{
     public void update() {
         updateHeader(controller.getUser());
         updateListSystem(controller.getUser());
+        updateListEvents(controller.getEvents());
 
         revalidate();
     }
