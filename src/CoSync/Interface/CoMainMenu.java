@@ -26,7 +26,10 @@ public class CoMainMenu extends CoInterface{
     private JPanel south;
 
     private JScrollPane eventsPanel;
+    private JScrollPane sysPanel;
     private Box evList;
+    private Box sysList;
+
     private JToolBar toolBar;
 
     private Label header;
@@ -69,6 +72,11 @@ public class CoMainMenu extends CoInterface{
         east.setBorder(new LineBorder(Color.black));
         east.setPreferredSize(new Dimension(dimInterface.width / 5, dimInterface.height));
 
+        sysList = Box.createVerticalBox();
+        sysPanel = new JScrollPane(sysList);
+        sysPanel.setBorder(new EmptyBorder(1,1,1,1));
+
+        east.add(sysPanel);
         add(east, BorderLayout.EAST);
     }
 
@@ -100,8 +108,8 @@ public class CoMainMenu extends CoInterface{
         editFiles.setAlignmentX(LEFT_ALIGNMENT);
 
         toolBar = new JToolBar();
-        toolBar.add(Box.createHorizontalGlue());
         toolBar.add(editFiles);
+        toolBar.add(Box.createHorizontalGlue());
         toolBar.add(quit);
 
         south.add(toolBar);
@@ -120,19 +128,17 @@ public class CoMainMenu extends CoInterface{
 
     public void updateListSystem(Couser user) {
         System.out.println("UPDATE LIST SYSTEM");
-        east.removeAll();
-
-        Box sysBox = Box.createVerticalBox();
+        sysList.removeAll();
 
         for(Cosystem system: user.getCosystems()) {
 
             Box sys = Box.createVerticalBox();
             sys.setAlignmentX(RIGHT_ALIGNMENT);
             sys.setAlignmentY(TOP_ALIGNMENT);
-            sys.setBorder(new EmptyBorder(0,3,5,5));
+            sys.setBorder(new EmptyBorder(0,3,5,10));
             sys.setBackground(Color.WHITE);
 
-            sys.setPreferredSize(new Dimension(east.getWidth() - 4, east.getHeight() / 10 - 10));
+            sys.setMaximumSize(new Dimension(east.getWidth(), east.getHeight() / 10 - 10));
 
             Label name = new Label(system.getName());
             name.setAlignment(Label.RIGHT);
@@ -142,15 +148,10 @@ public class CoMainMenu extends CoInterface{
             ip.setAlignment(Label.RIGHT);
             sys.add(ip);
 
-            sysBox.add(sys);
+            sysList.add(sys);
         }
 
-        sysBox.add(Box.createVerticalGlue());
-
-        JScrollPane scroll = new JScrollPane(sysBox);
-        scroll.setBorder(new EmptyBorder(1,1,1,1));
-        east.add(scroll);
-
+        sysList.add(Box.createVerticalGlue());
         east.revalidate();
     }
 
@@ -181,11 +182,13 @@ public class CoMainMenu extends CoInterface{
         }
 
         evList.add(Box.createVerticalGlue());
-        eventsPanel.revalidate();
+        center.revalidate();
     }
 
     public void update() {
         updateHeader(controller.getUser());
         updateListSystem(controller.getUser());
+
+        revalidate();
     }
 }

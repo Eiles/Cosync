@@ -128,6 +128,22 @@ public class CoController extends Thread {
         ArrayList<Cosystem> systems = new ArrayList<>();
         systems.add(new Cosystem("192.168.1.1", "000", "My PC"));
         systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
+        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
+        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
+        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
+        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
+        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
+        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
+        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
+        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
+        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
+        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
+        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
+        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
+        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
+        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
+        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
+        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
         user.setCosystems(systems);
 
         switchView("main");
