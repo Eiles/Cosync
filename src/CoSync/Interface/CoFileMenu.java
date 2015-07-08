@@ -169,9 +169,21 @@ public class CoFileMenu extends CoInterface {
         add(south, BorderLayout.SOUTH);
     }
 
+    private void updateFileTree() {
+        File root = new File(Config.root);
+        CoFileTreeModel model = new CoFileTreeModel(root);
+
+        filesTree.clearSelection();
+        filesTree.setModel(model);
+
+        filesTree.revalidate();
+    }
+
     @Override
     public void update() {
+        updateFileTree();
 
+        revalidate();
     }
 }
 
