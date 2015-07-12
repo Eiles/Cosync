@@ -1,3 +1,4 @@
+import java.util.HashMap;
 import java.util.LinkedList;
 
 /**
@@ -5,14 +6,25 @@ import java.util.LinkedList;
  */
 public class CoSignal {
     protected LinkedList<String> requestList=new LinkedList<>();
-    protected Cofile fileInfo;
+    protected Cofile fileInfo=null;
+    protected int blockState[]=null;
+    protected boolean busy=false;
+    protected HashMap <String,Boolean> hasfile=new HashMap<>();
 
-    public Cofile getFileInfo() {
+    public synchronized Cofile getFileInfo() {
         return fileInfo;
     }
 
-    public void setFileInfo(Cofile fileInfo) {
+    public synchronized void setFileInfo(Cofile fileInfo) {
+        System.out.println("Fileinfo setted");
+        this.blockState=new int[fileInfo.blockHash.length];
         this.fileInfo = fileInfo;
+    }
+    public synchronized int[] getBlockState() {
+        return this.blockState;
+    }
+    public synchronized void setBlockState(int blocknum, int value){
+        this.getBlockState()[blocknum]=value;
     }
 
     public synchronized String getRequest(){
@@ -22,4 +34,26 @@ public class CoSignal {
     public synchronized void addRequest(String request) {
         this.requestList.add(request);
     }
+
+    public synchronized void setBusy(boolean busy){
+        this.busy=busy;
+    }
+
+    public synchronized void setHasfile(HashMap<String,Boolean> hasfile){
+        this.hasfile=hasfile;
+    }
+
+    public synchronized void addHasFile(String path, Boolean hasFile) {
+        hasfile.put(path,hasFile);
+    }
+
+    public synchronized HashMap getHasfile(){
+        return this.hasfile;
+    }
+
+    public synchronized boolean getBusy(){
+        return this.busy;
+    }
+
 }
+

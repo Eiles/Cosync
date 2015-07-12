@@ -9,8 +9,9 @@ public class Cosocket implements Runnable {
     private Socket connection;
     private int id;
     private boolean auth;
-    private CoSignal sharedSignal;
+    public CoSignal sharedSignal;
     private Cofile cofile;
+
     public Cosocket(Socket s, int i, CoSignal signal) {
         this.connection = s;
         this.id = i;
@@ -35,44 +36,53 @@ public class Cosocket implements Runnable {
                 //If has request to send
                 if(sharedSignal.requestList.size()!=0){
                     //Send request
-                    sendRequest(sharedSignal.getRequest());
-                }
-                //Keep waiting for a request
-                toRead=dis.readInt();
-                if(toRead>0) {
-                    System.out.println(toRead);
-                    request=new byte[toRead];
-                }
-                while(i<toRead){
-                    request[i]=dis.readByte();
-                    i++;
-                }
-                //Convert byte array to String
-                process=new String(request,"UTF-8");
-                //Search for a separator
-                if((index=process.indexOf((char)58))!=-1){
-                    //Get args
-                    args=process.split(":");
-                    process=args[0];
-                    if(args.length>1){
-                        args = Arrays.copyOfRange(args, 1, args.length);
-                    }
-                }
+                    String myreq=sharedSignal.getRequest();
+                    System.out.println(myreq);
+                    System.out.println("Requesting "+myreq);
+                    sendRequest(myreq);
 
-                System.out.println(process);
-                for(i=0;i<args.length;i++){
-                    System.out.print(args[i]);
                 }
-                toRead=0;
-                //Handle request
-                treatRequest(process,args);
-                i=0;
-                process=null;
-                args=null;
+                if(dis.available()>0){
+                    toRead=dis.readInt();
+                    System.out.println("Reading");
+                    if(toRead>0){
+                        request=new byte[toRead];
+                    }else{
+                        break;
+                    }
+                    while(i<toRead){
+                        request[i]=dis.readByte();
+                        i++;
+                    }
+                    //Convert byte array to String
+                    process=new String(request,"UTF-8");
+                    //Search for a separator
+                    if((index=process.indexOf((char)58))!=-1){
+                        //Get args
+                        args=process.split(":");
+                        process=args[0];
+                        if(args.length>1){
+                            args = Arrays.copyOfRange(args, 1, args.length);
+                        }
+                    }
+
+                    System.out.println(process);
+                    for(i=0;i<args.length;i++){
+                        System.out.print(args[i]);
+                    }
+                    toRead=0;
+                    //Handle request
+                    treatRequest(process,args);
+                    i=0;
+
+                    process=null;
+                    args=null;
+                }
+                Thread.sleep(100);
             }
         }
         catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 
@@ -106,6 +116,10 @@ public class Cosocket implements Runnable {
                     connection.close();
                     break;
             }
+            case "hasFileResponse" : {
+                hasFileResponse(args);
+                break;
+            }
         }
     }
     public void sendDataBase() throws IOException {
@@ -126,6 +140,7 @@ public class Cosocket implements Runnable {
         }
         System.out.println(cpt);
         bos.flush();
+        this.sharedSignal.setBusy(false);
     }
 
     public void sendFileInfo(String[] path) throws IOException, NoSuchAlgorithmException {
@@ -133,13 +148,21 @@ public class Cosocket implements Runnable {
         Cofile file=new Cofile(path[0],0,false);
         file.generateHash();
         file.generateBlockHash();
-
+        file.setModDate(new File(file.getAbsolutePath()).lastModified());
+        file.setLength(new File(file.getAbsolutePath()).length());
         BufferedOutputStream bos = new BufferedOutputStream(connection.getOutputStream());
         ObjectOutputStream oos=new ObjectOutputStream(bos);
-        int byte_;
-        int cpt=0;
         oos.writeObject(file);
         oos.flush();
+        this.sharedSignal.setBusy(false);
+    }
+
+    public void hasFileResponse(String[] args) throws IOException, NoSuchAlgorithmException {
+        if(args[1].equals("true")){
+            this.sharedSignal.addHasFile(args[0],true);
+        }else{
+            this.sharedSignal.addHasFile(args[0],false);
+        }
     }
 
     public void compareToken() throws IOException {
@@ -170,8 +193,8 @@ public class Cosocket implements Runnable {
         if(token.equals("abcdefgh")){
             System.out.println("TOKEN OK");
             this.auth=true;
-
         }
+        this.sharedSignal.setBusy(false);
 
 
     }
@@ -196,26 +219,29 @@ public class Cosocket implements Runnable {
             }
             getBlock(args);
         }
-
+        this.sharedSignal.setBusy(false);
 
     }
 
     public void getFileInfo() throws IOException {
+        System.out.println("Waiting for fileInfo");
         ObjectInputStream ois=new ObjectInputStream(connection.getInputStream());
-        Cofile file= null;
+        Cofile cofile = null;
         try {
-            while((file = (Cofile)ois.readObject())==null);
+            while((cofile = (Cofile)ois.readObject())==null);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
         try {
-            System.out.println(file.getHexHash());
+            this.sharedSignal.setFileInfo(cofile);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public void getBlock(String[] args) throws IOException {
+        this.sharedSignal.setBusy(true);
+        this.sharedSignal.blockState[Integer.parseInt(args[1])] = 1;
         //System.out.println("GetBlock Function");
         BufferedInputStream bis=new BufferedInputStream(connection.getInputStream());
         DataInputStream dis=new DataInputStream(bis);
@@ -234,23 +260,31 @@ public class Cosocket implements Runnable {
             i++;
         }
 
-        RandomAccessFile raf=new RandomAccessFile("/Users/elie/truc.avi","rw");
-        raf.write(writeBlock,1024*1024*Integer.parseInt(args[1]),writeBlock.length);
+        RandomAccessFile raf=new RandomAccessFile(Config.root+"/"+sharedSignal.getFileInfo().getPath(),"rw");
+        raf.seek(1024*1024*Integer.parseInt(args[1]));
+        raf.write(writeBlock,0,writeBlock.length);
         raf.close();
+        this.sharedSignal.setBlockState(Integer.parseInt(args[1]),2);
+        this.sharedSignal.setBusy(false);
     }
 
     public void sendBlock(String[] args) throws IOException, InterruptedException {
+
         RandomAccessFile raf=new RandomAccessFile(Config.root+"/"+args[0],"r");
         BufferedInputStream bis = new BufferedInputStream(connection.getInputStream());
+
         byte[] block=new byte[1024*1024];
-        int read=raf.read(block,1024*1024*Integer.parseInt(args[1]),block.length);
+        raf.seek(1024*1024*Integer.parseInt(args[1]));
+        int read=raf.read(block,0,block.length);
         BufferedOutputStream bos=new BufferedOutputStream(connection.getOutputStream());
         DataOutputStream dos=new DataOutputStream(bos);
         dos.writeInt(read);
         System.out.println("Sent int for block : "+read);
         dos.write(block);
         dos.flush();
+
     }
+
     public void sendToken(String token) throws IOException {
         int i=0;
         BufferedOutputStream bos = new BufferedOutputStream(connection.getOutputStream());
@@ -261,17 +295,15 @@ public class Cosocket implements Runnable {
         dos.write(b);
         dos.flush();
         System.out.println("Request sent : "+token);
+        this.sharedSignal.setBusy(false);
     }
+
 
     public void hasFile(String path) throws IOException {
-        if(new File(Config.root+"/"+path).exists()){
-            sendRequest("hasFileResponse: "+path);
-        }
+        if(new File(Config.root+"/"+path).exists())
+            sendRequest("hasFileResponse:"+path+":true");
         else
-            sendRequest("hasFileResponse: "+path);
+            sendRequest("hasFileResponse:"+path+":false");
     }
 
-    public Socket getConnection(){
-        return connection;
-    }
 }

@@ -1,5 +1,5 @@
 
 public interface Config {
-    public String root="/Users/elie/Sites/gextra";
+    public String root="/Users/elie/Cosync";
 
 }

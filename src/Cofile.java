@@ -2,6 +2,7 @@ import difflib.*;
 import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,13 +11,22 @@ public class Cofile implements Config,Serializable{
     String path;
     long modDate;
     byte[][]blockHash;
+    long length;
 
 
+    public long getLength() {
+        return length;
+    }
+
+    public void setLength(long length) {
+        this.length = length;
+    }
 
     public Cofile(String path,long date,boolean suppressed) {
         super();
         this.path = path;
         this.modDate=date;
+
     }
 
     public String getPath() {
@@ -54,7 +64,10 @@ public class Cofile implements Config,Serializable{
         int nread;
         try{
             fis = new FileInputStream(this.getAbsolutePath());
-            this.blockHash=new byte[(int)Math.ceil((new File(this.getAbsolutePath())).length()/(1024*1024))][];
+            int hashsize=(int)Math.ceil((double)(new File(this.getAbsolutePath())).length()/(double)(1024*1024));
+            System.out.println((new File(this.getAbsolutePath())).length());
+            this.blockHash=new byte[hashsize][];
+
             while(blockNumber<this.blockHash.length) {
                 byte[] dataBytes = new byte[1024*1024];
                 nread=fis.read(dataBytes);
@@ -136,5 +149,18 @@ public class Cofile implements Config,Serializable{
             }
         }
         return blockHash;
+    }
+
+    @Override public boolean equals(Object other) {
+        //check for self-comparison
+        if ( this == other ) return true;
+
+        if ( !(this instanceof Cofile) ) return false;
+
+        //cast to native object is now safe
+        Cofile that = (Cofile)other;
+
+        //now a proper field-by-field evaluation can be made
+        return Arrays.equals(this.getBlockHash(),((Cofile) other).getBlockHash());
     }
 }
