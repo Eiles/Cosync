@@ -30,6 +30,8 @@ public class LoginEvents {
                     controller.logIn(loginMenu.getLogin().getText(), loginMenu.getPassword().getPassword().toString());
                 } catch (InterruptedException e1) {
                     e1.printStackTrace();
+                } catch (Exception e1) {
+                    e1.printStackTrace();
                 }
             }
         }

@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
 
-import java.nio.file.*;
 import static java.nio.file.StandardWatchEventKinds.*;
 
 /**
@@ -23,7 +22,7 @@ import static java.nio.file.StandardWatchEventKinds.*;
  */
 public class CoController extends Thread {
     private CoDB coDB;
-    private CoWatcher coWatcher;
+    private CoWatcher watcher;
     private Coserver coserver;
 
     private final HashMap<String, CoInterface> views;
@@ -57,7 +56,7 @@ public class CoController extends Thread {
         Path dir = new File(Config.root).toPath();
 
         this.coDB = new CoDB();
-        this.coWatcher = new CoWatcher(dir, true, this);
+        this.watcher = new CoWatcher(dir, true, this);
 
         events = new Stack<>();
         views  = new HashMap<>();
@@ -75,7 +74,6 @@ public class CoController extends Thread {
 
     private void proceed() throws InterruptedException, IOException {
         views.put("login", new CoLoginMenu(this));
-
         loader = new CoLoader();
 
         try {
@@ -145,17 +143,18 @@ public class CoController extends Thread {
         }
     }
 
-    public void logIn(String name, String password) throws InterruptedException {
+    public void logIn(String name, String password) throws Exception {
 
         //TODO: Vérification et récupération des données du User
         Couser user = new Couser(name, password);
         this.user = user;
 
         ArrayList<Cosystem> systems = new ArrayList<>();
-        systems.add(new Cosystem("192.168.1.1", "000", "My PC"));
+        /*systems.add(new Cosystem("192.168.1.1", "000", "My PC"));
         systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
 
-        user.setCosystems(systems);
+        user.setCosystems(systems);*/
+        user.retrieveCosystems();
 
         switchView("main");
     }
@@ -168,9 +167,16 @@ public class CoController extends Thread {
     private Boolean initApp() {
 
         try {
+            System.out.println("Init Application");
+
             Runnable server = new Coserver();
             Thread threadServer= new Thread(server);
             threadServer.start();
+
+            CoDownSignal downSignal = new CoDownSignal();
+            Runnable downloader = new CoDownloader(downSignal, this);
+            Thread downloadThread = new Thread(downloader);
+            downloadThread.start();
 
             long startTime = System.currentTimeMillis();
             String sql = "CREATE TABLE FILES " +
@@ -196,9 +202,9 @@ public class CoController extends Thread {
             long totalTime = endTime - startTime;
             System.out.println("totalTime => "+totalTime);
 
-            coWatcher.start();
-            coWatcher.checkFolder(Paths.get(Config.root),coDB);
-            coWatcher.saveSuppressed(coDB);
+            watcher.start();
+            watcher.checkFolder(Paths.get(Config.root), coDB);
+            watcher.saveSuppressed(coDB);
 
             return true;
         } catch (Exception e) {

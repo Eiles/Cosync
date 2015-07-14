@@ -18,13 +18,17 @@ public class CoDownloader implements Runnable{
     long downloadStart;
     int blockState[]=null;
     CoDownSignal downSignal;
+    private CoController controller;
 
-    public CoDownloader(CoDownSignal signal) {
+    public CoDownloader(CoDownSignal signal, CoController controller) {
+        this.controller = controller;
         this.downSignal=signal;
     }
 
     public void run() {
         try {
+            System.out.println("Start CoDownloader");
+
             initSockets();
             while (true){
                 if(downSignal.requestList.size()!=0){
@@ -45,14 +49,16 @@ public class CoDownloader implements Runnable{
     }
 
     public void initSockets() throws Exception {
-        Couser elie=new Couser("elie","password");
-        elie.retrieveCosystems();
+        System.out.println("Init Sockets");
+        controller.getUser().retrieveCosystems();
         InetAddress address;
         Cosystem system;
         CoSignal signal;
-        for(int i=0;i<elie.getCosystems().size();i++){
+
+        System.out.println("cosystems => "+controller.getUser().getCosystems());
+        for(int i=0;i<controller.getUser().getCosystems().size();i++){
             signal=new CoSignal();
-            system=elie.getCosystems().get(i);
+            system =controller.getUser().getCosystems().get(i);
             address=InetAddress.getByName(system.getIp());
             Runnable client=new Cosocket(new Socket(address, 7777),0,signal);
             Thread threadClient= new Thread(client);
