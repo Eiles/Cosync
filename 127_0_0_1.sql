@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Client: localhost
--- Généré le: Mer 01 Juillet 2015 à 10:12
+-- Généré le: Mar 14 Juillet 2015 à 16:33
 -- Version du serveur: 5.5.24-log
 -- Version de PHP: 5.4.3
 
@@ -47,6 +47,28 @@ INSERT INTO `systems` (`id`, `key`, `user_id`, `last_ip`, `is_master`, `is_regis
 (3, 'ABC', 9, '255.255.255.255', 1, 0),
 (4, 'ABD', 9, '1.1.1.1', 0, 1),
 (5, 'BLA', 1, '1.1.1.1', 0, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `user`
+--
+
+CREATE TABLE IF NOT EXISTS `user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) DEFAULT NULL,
+  `password` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
+
+--
+-- Contenu de la table `user`
+--
+
+INSERT INTO `user` (`id`, `name`, `password`) VALUES
+(1, 'elie', 'password'),
+(9, 'a', 'a'),
+(10, 'z', '0');
 
 --
 -- Contraintes pour les tables exportées
