@@ -2,7 +2,9 @@ package Interface.Events;
 
 import Controllers.CoController;
 import Interface.CoLoginMenu;
+import sun.security.util.Password;
 
+import javax.swing.text.PasswordView;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -25,9 +27,10 @@ public class LoginEvents {
         @Override
         public void actionPerformed(ActionEvent e) {
             if((loginMenu.getLogin().getText().length() > 0) && (loginMenu.getPassword().getPassword().length > 0)) {
+
                 //Vérification des données saisies
                 try {
-                    controller.logIn(loginMenu.getLogin().getText(), loginMenu.getPassword().getPassword().toString());
+                    controller.logIn(loginMenu.getLogin().getText(), loginMenu.getPassword().getText());
                 } catch (InterruptedException e1) {
                     e1.printStackTrace();
                 } catch (Exception e1) {

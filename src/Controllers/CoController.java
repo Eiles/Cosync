@@ -149,12 +149,11 @@ public class CoController extends Thread {
         Couser user = new Couser(name, password);
         this.user = user;
 
-        ArrayList<Cosystem> systems = new ArrayList<>();
-        /*systems.add(new Cosystem("192.168.1.1", "000", "My PC"));
-        systems.add(new Cosystem("192.168.1.10", "001", "My Other PC"));
-
-        user.setCosystems(systems);*/
         user.retrieveCosystems();
+        CoDownSignal downSignal = new CoDownSignal();
+        Runnable downloader = new CoDownloader(downSignal, this);
+        Thread downloadThread = new Thread(downloader);
+        downloadThread.start();
 
         switchView("main");
     }
@@ -172,11 +171,6 @@ public class CoController extends Thread {
             Runnable server = new Coserver();
             Thread threadServer= new Thread(server);
             threadServer.start();
-
-            CoDownSignal downSignal = new CoDownSignal();
-            Runnable downloader = new CoDownloader(downSignal, this);
-            Thread downloadThread = new Thread(downloader);
-            downloadThread.start();
 
             long startTime = System.currentTimeMillis();
             String sql = "CREATE TABLE FILES " +

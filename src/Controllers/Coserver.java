@@ -10,7 +10,7 @@ public class Coserver
         implements Runnable{
 
     private int port = 7777;
-    private int  count = 0;
+    private int count = 0;
 
 
 

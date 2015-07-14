@@ -109,7 +109,7 @@ public class CoWatcher extends Thread{
                 if (kind == OVERFLOW) {
                     continue;
                 }
-
+                
                 // On recupère les infos d'evenements
                 WatchEvent ev = event;
                 Path name = (Path) ev.context();

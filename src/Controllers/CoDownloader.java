@@ -50,16 +50,17 @@ public class CoDownloader implements Runnable{
 
     public void initSockets() throws Exception {
         System.out.println("Init Sockets");
-        controller.getUser().retrieveCosystems();
+
         InetAddress address;
         Cosystem system;
         CoSignal signal;
 
-        System.out.println("cosystems => "+controller.getUser().getCosystems());
         for(int i=0;i<controller.getUser().getCosystems().size();i++){
             signal=new CoSignal();
             system =controller.getUser().getCosystems().get(i);
             address=InetAddress.getByName(system.getIp());
+
+            System.out.println("ip => "+system.getIp());
             Runnable client=new Cosocket(new Socket(address, 7777),0,signal);
             Thread threadClient= new Thread(client);
             threadClient.start();

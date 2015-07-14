@@ -84,6 +84,7 @@ public class Couser {
         }
         in.close();
         JSONArray array = (JSONArray) JSONValue.parse(response.toString());
+
         List<Cosystem> systems = new ArrayList<Cosystem>();
         for (int i = 0; i < array.size(); i++) {
             JSONObject tempobj = (JSONObject) (array.get(i));
@@ -92,7 +93,7 @@ public class Couser {
         }
         this.setCosystems(systems);
         for(int i =0;i<systems.size();i++){
-            System.out.println(systems.get(i).getIp());
+            System.out.println("ip => "+systems.get(i).getIp());
         }
 
     }
