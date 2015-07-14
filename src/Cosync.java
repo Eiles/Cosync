@@ -4,16 +4,12 @@
 
 import java.io.File;
 import java.io.IOException;
-import java.net.ServerSocket;
+import java.net.InetAddress;
 import java.net.Socket;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.ParseException;
+
 import java.text.SimpleDateFormat;
 
 public class Cosync {
@@ -38,19 +34,46 @@ public class Cosync {
         db.update(sql);
         db.prepareInsertBatch(db.insertFileSQL);
         db.prepareUpdateBatch(db.updateFileSQL);
+        db.executeBatchInsert();
+        db.executeBatchUpdate();
         Path dir = new File(Config.root).toPath();
         CoWatcher watcher = new CoWatcher(dir, true,db);
         watcher.start();
+        long endTime   = System.currentTimeMillis();
+        long totalTime = endTime - startTime;
+        System.out.println(totalTime);
         watcher.checkFolder(Paths.get(Config.root),db);
         watcher.saveSuppressed(db);
 
-        System.out.println(cpt);
-        Coserver server=new Coserver();
-
-        db.executeBatchInsert();
-        db.executeBatchUpdate();
-        long endTime   = System.currentTimeMillis();
-        long totalTime = endTime - startTime;
+        Runnable server = new Coserver();
+        Thread threadServer= new Thread(server);
+        threadServer.start();
+        /*CoSignal signal=new CoSignal();
+        InetAddress address = InetAddress.getByName("localhost");
+        Socket connection = new Socket(address, 7777);
+        Runnable client=new Cosocket(connection,0,signal);
+        Thread threadClient= new Thread(client);
+        threadClient.start();
+        //signal.addRequest("auth");
+        signal.addRequest("getBlock:Parks.and.Recreation.S02E01.HDTV.XviD-2HD.avi:0");
+        /*File testFile=new File(Config.root+"/"+"Project Zomboid.zip");
+        Cofile testCofile = new Cofile("Project Zomboid.zip",0,false);
+        System.out.println("Size : "+testFile.length());
+        System.out.println(testCofile.getHexHash());
+        testCofile.generateBlockHash();
+        for(int i=0;i<testCofile.blockHash.length;i++){
+            System.out.println("Block "+(i+1)+" : "+testCofile.hashToHex(testCofile.blockHash[i]));
+        }*/
+        /*Cofile file=new Cofile("2",0,false);
+        file.generateBlockHash();
+        System.out.println("Blocks : "+ file.blockHash.length);*/
+        CoDownSignal signal=new CoDownSignal();
+        CoDownloader dler=new CoDownloader(signal);
+        Thread threadDler= new Thread(dler);
+        threadDler.start();
+        signal.addRequest("film.avi");
+        endTime   = System.currentTimeMillis();
+        totalTime = endTime - startTime;
         System.out.println(totalTime);
     }
 }

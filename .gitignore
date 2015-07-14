@@ -15,3 +15,7 @@ hs_err_pid*
 test.db
 .idea/*
 *.iml
+
+*.db
+*.xml
+src/Config.java
