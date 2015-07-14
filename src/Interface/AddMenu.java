@@ -1,4 +1,4 @@
-package CoSync.Interface;
+package Interface;
 
 import javax.swing.*;
 import java.awt.*;

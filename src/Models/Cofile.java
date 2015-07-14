@@ -1,3 +1,6 @@
+package Models;
+
+import Controllers.Config;
 import difflib.*;
 import java.io.*;
 import java.security.MessageDigest;
@@ -10,7 +13,7 @@ public class Cofile implements Config,Serializable{
     byte[] hash;
     String path;
     long modDate;
-    byte[][]blockHash;
+    public byte[][]blockHash;
     long length;
 
 

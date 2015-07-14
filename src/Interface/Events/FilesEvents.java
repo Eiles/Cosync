@@ -1,8 +1,8 @@
-package CoSync.Interface.Events;
+package Interface.Events;
 
-import CoSync.CoController;
-import CoSync.Interface.CoFileMenu;
-import CoSync.Services.FilesServices;
+import Controllers.CoController;
+import Interface.CoFileMenu;
+import Services.FilesServices;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

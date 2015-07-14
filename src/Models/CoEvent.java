@@ -1,4 +1,4 @@
-package CoSync.Models;
+package Models;
 
 /**
  * Created by Alban on 28/06/2015.

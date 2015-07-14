@@ -1,4 +1,4 @@
-package CoSync.Interface.Events;
+package Interface.Events;
 
 import javax.swing.*;
 import java.awt.event.WindowAdapter;

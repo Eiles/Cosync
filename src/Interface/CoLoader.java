@@ -1,6 +1,4 @@
-package CoSync.Interface;
-
-import CoSync.Interface.Events.InterfaceEvents;
+package Interface;
 
 import javax.swing.*;
 import java.awt.*;

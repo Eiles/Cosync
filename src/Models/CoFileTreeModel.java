@@ -1,4 +1,4 @@
-package CoSync.Models;
+package Models;
 
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;

@@ -1,7 +1,7 @@
-package CoSync.Interface.Events;
+package Interface.Events;
 
-import CoSync.CoController;
-import CoSync.Interface.CoLoginMenu;
+import Controllers.CoController;
+import Interface.CoLoginMenu;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

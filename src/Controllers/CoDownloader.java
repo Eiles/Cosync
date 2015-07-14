@@ -1,11 +1,12 @@
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
+package Controllers;
+
+import Models.Cosystem;
+import Models.Couser;
+
 import java.io.File;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 
 /**
  * Created by elie on 19/06/15.

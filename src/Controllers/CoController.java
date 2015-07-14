@@ -1,9 +1,9 @@
-package CoSync;
+package Controllers;
 
-import CoSync.Interface.*;
-import CoSync.Models.CoEvent;
-import CoSync.Models.Cosystem;
-import CoSync.Models.Couser;
+import Interface.*;
+import Models.CoEvent;
+import Models.Cosystem;
+import Models.Couser;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,7 +53,7 @@ public class CoController extends Thread {
         Path dir = new File(Config.root).toPath();
 
         this.coDB = new CoDB();
-        this.coWatcher = new CoWatcher(dir, true, this);
+        this.coWatcher = new CoWatcher(dir, true, coDB);
 
         events = new Stack<>();
         views  = new HashMap<>();
@@ -167,7 +167,7 @@ public class CoController extends Thread {
 
             /*InetAddress address = InetAddress.getByName("10.33.1.247");
             Socket connection = new Socket(address, 8080);
-            Runnable client=new Cosocket(connection,0);
+            Runnable client=new Controllers.Cosocket(connection,0);
             Thread threadClient= new Thread(client);
             threadClient.start();*/
 

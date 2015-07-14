@@ -1,20 +1,18 @@
-package CoSync.Interface;
+package Interface;
 
 /**
  * Created by Alban on 01/07/2015.
  */
 
-import CoSync.CoController;
-import CoSync.Config;
-import CoSync.Interface.Events.FilesEvents;
-import CoSync.Interface.Events.InterfaceEvents;
-import CoSync.Models.CoFileTreeModel;
-import CoSync.Services.FilesServices;
+import Controllers.CoController;
+import Controllers.Config;
+import Interface.Events.FilesEvents;
+import Interface.Events.InterfaceEvents;
+import Models.CoFileTreeModel;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;

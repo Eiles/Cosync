@@ -1,4 +1,4 @@
-package CoSync.Services;
+package Services;
 
 import java.io.File;
 

@@ -1,6 +1,6 @@
-package CoSync.Interface;
+package Interface;
 
-import CoSync.CoController;
+import Controllers.CoController;
 
 import javax.swing.*;
 import java.awt.*;

@@ -1,14 +1,13 @@
-package CoSync.Interface;
+package Interface;
 
-import CoSync.CoController;
-import CoSync.Models.CoEvent;
-import CoSync.Interface.Events.InterfaceEvents;
-import CoSync.Models.Cosystem;
-import CoSync.Models.Couser;
+import Controllers.CoController;
+import Models.CoEvent;
+import Interface.Events.InterfaceEvents;
+import Models.Cosystem;
+import Models.Couser;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

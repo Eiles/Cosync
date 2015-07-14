@@ -1,7 +1,7 @@
-package CoSync.Interface;
+package Interface;
 
-import CoSync.CoController;
-import CoSync.Interface.Events.LoginEvents;
+import Controllers.CoController;
+import Interface.Events.LoginEvents;
 
 import javax.swing.*;
 import java.awt.*;

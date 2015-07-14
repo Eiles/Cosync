@@ -1,3 +1,7 @@
+package Controllers;
+
+import Models.Cofile;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 

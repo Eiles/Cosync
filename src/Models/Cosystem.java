@@ -1,4 +1,4 @@
-package CoSync.Models;
+package Models;
 
 public class Cosystem {
     String ip;
