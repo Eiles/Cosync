@@ -16,3 +16,4 @@ test.db
 .idea/*
 *.iml
 .idea/misc.xml
+cosync.db

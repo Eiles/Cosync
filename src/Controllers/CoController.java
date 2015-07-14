@@ -9,10 +9,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.WatchEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
+
+import java.nio.file.*;
+import static java.nio.file.StandardWatchEventKinds.*;
 
 /**
  * Controlleur général de l'application
@@ -53,7 +57,7 @@ public class CoController extends Thread {
         Path dir = new File(Config.root).toPath();
 
         this.coDB = new CoDB();
-        this.coWatcher = new CoWatcher(dir, true, coDB);
+        this.coWatcher = new CoWatcher(dir, true, this);
 
         events = new Stack<>();
         views  = new HashMap<>();
@@ -97,9 +101,24 @@ public class CoController extends Thread {
         }
     }
 
-    public void addEvent(String type, String message) {
-        events.push(new CoEvent(type, message));
+    public void addEvent(WatchEvent.Kind kind, Path child) {
+
+        String type = null;
+
+        if(kind == ENTRY_DELETE) {
+            type = "Suppression";
+        }
+
+        if(kind == ENTRY_CREATE) {
+            type = "Ajout";
+        }
+
+        if(kind == ENTRY_MODIFY) {
+            type = "Modification";
+        }
+
         if(views.get("main") != null) {
+            events.push(new CoEvent(type, child.getFileName().toString()));
             ((CoMainMenu)views.get("main")).updateListEvents(events);
         }
     }

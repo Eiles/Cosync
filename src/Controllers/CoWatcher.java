@@ -18,14 +18,17 @@ public class CoWatcher extends Thread{
     private boolean trace = true;
     private CoDB db;
     private boolean active=false;
+    private CoController controller;
 
     /**
      * Constructeur
      */
-    CoWatcher(Path dir, boolean recursive,CoDB db) throws IOException {
+    CoWatcher(Path dir, boolean recursive,CoController controller) throws IOException {
         this.watcher = FileSystems.getDefault().newWatchService();
         this.keys = new HashMap();
         this.recursive = recursive;
+        this.controller = controller;
+        this.db = controller.getCoDB();
 
         if (recursive) {
             System.out.format("Scanning %s ...\n", dir);
@@ -188,6 +191,8 @@ public class CoWatcher extends Thread{
                         }
                     }
                 }
+
+                controller.addEvent(kind, child);
             }
 
             // On retire la clef si le dossier n'est plus accessible
