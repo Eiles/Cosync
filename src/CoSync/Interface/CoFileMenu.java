@@ -6,16 +6,10 @@ package CoSync.Interface;
 
 import CoSync.CoController;
 import CoSync.Config;
-import CoSync.Interface.Events.FilesEvents;
 import CoSync.Interface.Events.InterfaceEvents;
 import CoSync.Models.CoFileTreeModel;
-import CoSync.Services.FilesServices;
 
 import javax.swing.*;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -26,10 +20,7 @@ import java.io.File;
  */
 public class CoFileMenu extends CoInterface {
 
-    private FilesEvents events;
     private Dimension dimInterface;
-
-    private AddMenu addMenu;
 
     private JPanel north;
     private JPanel center;
@@ -43,7 +34,6 @@ public class CoFileMenu extends CoInterface {
     private JToolBar fileBar;
 
     private Label header;
-    private File selected;
 
     public CoFileMenu(CoController coController) {
 
@@ -52,10 +42,6 @@ public class CoFileMenu extends CoInterface {
         getContentPane().setLayout(new BorderLayout());
         addWindowListener(new InterfaceEvents());
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-
-        events = new FilesEvents(this, coController);
-        addMenu = new AddMenu();
-        selected = null;
 
         dimInterface = new Dimension(800, 600);
         setSize(dimInterface);
@@ -71,16 +57,43 @@ public class CoFileMenu extends CoInterface {
         north.setLayout(new BorderLayout());
 
         final JButton add = new JButton("Ajout");
-        add.addActionListener(events.getAddButtonEvent());
+        add.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    controller.logOut();
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
         add.setAlignmentX(RIGHT_ALIGNMENT);
 
         final JButton edit = new JButton("Edition");
-        edit.addActionListener(null);
+        edit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    controller.switchView("main");
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
         edit.setAlignmentX(LEFT_ALIGNMENT);
 
         final JButton delete = new JButton("Suppression");
-        delete.addActionListener(events.getDeleteButtonEvent());
-        delete.setAlignmentX(LEFT_ALIGNMENT);
+        edit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    controller.switchView("main");
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
+        edit.setAlignmentX(LEFT_ALIGNMENT);
 
 
         fileBar = new JToolBar();
@@ -108,23 +121,6 @@ public class CoFileMenu extends CoInterface {
 
         filesTree = new JTree();
         filesTree.setModel(model);
-        filesTree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
-
-        filesTree.addTreeSelectionListener(new TreeSelectionListener() {
-            @Override
-            public void valueChanged(TreeSelectionEvent e) {
-                //This method is useful only when the selection model allows a single selection.
-                File node = (File) filesTree.getLastSelectedPathComponent();
-
-                if (node == null)
-                    //Nothing is selected.
-                    return;
-
-                if (node.isFile()) {
-                    selected = node;
-                }
-            }
-        });
 
         filesTree.clearSelection();
         center.add(filesTree, BorderLayout.CENTER);
@@ -188,18 +184,6 @@ public class CoFileMenu extends CoInterface {
         updateFileTree();
 
         revalidate();
-    }
-
-    public File getSelected() {
-        return selected;
-    }
-
-    public void setSelected(File selected) {
-        this.selected = selected;
-    }
-
-    public void setAddMenuVisibility(Boolean visible) {
-        addMenu.setVisible(visible);
     }
 }
 
