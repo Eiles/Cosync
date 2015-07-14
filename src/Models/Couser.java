@@ -56,7 +56,7 @@ public class Couser {
 
     public void retrieveCosystems()
             throws Exception {
-        String url = "http://127.0.0.1/CoSync/api/systems.php";
+        String url = "http://127.0.0.1/CoSync/systems.php";
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.setRequestMethod("POST");
