@@ -18,3 +18,4 @@ test.db
 
 *.db
 *.xml
+src/Config.java
