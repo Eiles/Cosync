@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.Inet4Address;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.List;
 public class Couser {
     String name;
     String password;
-    List<Cosystem> Cosystems;
+    List<Cosystem> cosystems;
 
     public Couser(String name, String password)
     {
@@ -45,17 +46,17 @@ public class Couser {
     }
 
     public List<Cosystem> getCosystems() {
-        return Cosystems;
+        return this.cosystems;
     }
 
     public void setCosystems(List<Cosystem> cosystems) {
-        Cosystems = cosystems;
+        this.cosystems = cosystems;
     }
 
 
     public void retrieveCosystems()
             throws Exception {
-        String url = "http://cosync.local/api/systems.php";
+        String url = "http://192.168.1.96/api/systems.php";
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.setRequestMethod("POST");
@@ -86,9 +87,13 @@ public class Couser {
         List<Cosystem> systems = new ArrayList<Cosystem>();
         for (int i = 0; i < array.size(); i++) {
             JSONObject tempobj = (JSONObject) (array.get(i));
-            systems.add(new Cosystem(tempobj.get("last_ip").toString(), tempobj.get("key").toString(), tempobj.get("key").toString()));
+            if(!tempobj.get("last_ip").toString().equals(Inet4Address.getLocalHost().getHostAddress()))
+                systems.add(new Cosystem(tempobj.get("last_ip").toString(), tempobj.get("key").toString(), tempobj.get("key").toString()));
         }
         this.setCosystems(systems);
+        for(int i =0;i<systems.size();i++){
+            System.out.println(systems.get(i).getIp());
+        }
 
     }
 }
