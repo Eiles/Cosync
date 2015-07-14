@@ -95,6 +95,38 @@ public class Couser {
         for(int i =0;i<systems.size();i++){
             System.out.println("ip => "+systems.get(i).getIp());
         }
+    }
 
+    public boolean exist()
+            throws Exception {
+        String url = "http://127.0.0.1/CoSync/user.php";
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("User-Agent", "Mozilla/5.0");
+        con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+        String urlParameters = "action=connection&username=" + this.getName() + "&password=" + this.getPassword();
+
+        con.setDoOutput(true);
+        DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+        wr.writeBytes(urlParameters);
+        wr.flush();
+        wr.close();
+
+        int responseCode = con.getResponseCode();
+
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+        if (responseCode == 200) {
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+        }
+        in.close();
+
+        return Integer.parseInt(response.toString()) == 1?true:false;
     }
 }

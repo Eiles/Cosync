@@ -4,6 +4,7 @@ import Controllers.CoController;
 import Interface.CoLoginMenu;
 import sun.security.util.Password;
 
+import javax.swing.*;
 import javax.swing.text.PasswordView;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -36,6 +37,10 @@ public class LoginEvents {
                 } catch (Exception e1) {
                     e1.printStackTrace();
                 }
+            }
+
+            else {
+                JOptionPane.showMessageDialog(null, "Veuillez saisir toutes les informations demandées");
             }
         }
     }

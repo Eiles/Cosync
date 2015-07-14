@@ -5,6 +5,7 @@ import Models.CoEvent;
 import Models.Cosystem;
 import Models.Couser;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -145,17 +146,29 @@ public class CoController extends Thread {
 
     public void logIn(String name, String password) throws Exception {
 
-        //TODO: Vérification et récupération des données du User
-        Couser user = new Couser(name, password);
-        this.user = user;
+        try {
+            //TODO: Vérification et récupération des données du User
+            Couser user = new Couser(name, password);
+            this.user = user;
 
-        user.retrieveCosystems();
-        CoDownSignal downSignal = new CoDownSignal();
-        Runnable downloader = new CoDownloader(downSignal, this);
-        Thread downloadThread = new Thread(downloader);
-        downloadThread.start();
+            if (user.exist()) {
+                user.retrieveCosystems();
+                CoDownSignal downSignal = new CoDownSignal();
+                Runnable downloader = new CoDownloader(downSignal, this);
+                Thread downloadThread = new Thread(downloader);
+                downloadThread.start();
 
-        switchView("main");
+                switchView("main");
+            } else {
+                JOptionPane.showMessageDialog(null, "L'utilisateur renseigné n'existe pas");
+            }
+        }
+        catch (Exception e) {
+                loader.updateLoaderText(e.getMessage());
+                loader.setTitle("Erreur");
+                loader.setVisible(true);
+                e.printStackTrace();
+        }
     }
 
     public void logOut() throws InterruptedException {

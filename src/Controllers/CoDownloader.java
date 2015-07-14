@@ -60,7 +60,6 @@ public class CoDownloader implements Runnable{
             system =controller.getUser().getCosystems().get(i);
             address=InetAddress.getByName(system.getIp());
 
-            System.out.println("ip => "+system.getIp());
             Runnable client=new Cosocket(new Socket(address, 7777),0,signal);
             Thread threadClient= new Thread(client);
             threadClient.start();
