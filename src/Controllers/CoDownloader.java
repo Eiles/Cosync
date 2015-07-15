@@ -1,11 +1,14 @@
 package Controllers;
 
+import Interface.CoMainMenu;
 import Models.Cosystem;
 import Models.Couser;
 
+import javax.swing.*;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 
 /**
@@ -32,7 +35,7 @@ public class CoDownloader implements Runnable{
             initSockets();
             while (true){
                 if(downSignal.requestList.size()!=0){
-                    System.out.println(downSignal.requestList.size()!=0);
+                    System.out.println("Request list => "+downSignal.requestList.size());
                     String request=downSignal.getRequest();
                     getSocketsForFile(request);
                     if(socketsToUse.size()<1){
@@ -60,16 +63,27 @@ public class CoDownloader implements Runnable{
             system =controller.getUser().getCosystems().get(i);
             address=InetAddress.getByName(system.getIp());
 
-            Runnable client=new Cosocket(new Socket(address, 7777),0,signal);
-            Thread threadClient= new Thread(client);
-            threadClient.start();
-            socketArray.add(signal);
+            try {
+                Runnable client = new Cosocket(new Socket(address, 7777), 0, signal);
+                Thread threadClient = new Thread(client);
+                threadClient.start();
+                socketArray.add(signal);
+            }
+            catch (SocketException e) {
+                controller.getUser().getCosystems().get(i).setOnline(false);
+                ((CoMainMenu)controller.getViews().get("main")).updateListSystem(controller.getUser());
+            }
         }
+
         System.out.println("Found "+ socketArray.size()+"sockets");
     }
 
-    public void getLastDB() {
+    public void getLastDB() throws Exception{
+        System.out.println("Get Last DB");
 
+        for(CoSignal signal: socketArray) {
+            signal.addRequest("getDB");
+        }
     }
 
     public void getFile(String path) throws InterruptedException {

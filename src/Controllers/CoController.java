@@ -2,7 +2,6 @@ package Controllers;
 
 import Interface.*;
 import Models.CoEvent;
-import Models.Cosystem;
 import Models.Couser;
 
 import javax.swing.*;
@@ -12,7 +11,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.WatchEvent;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
 
@@ -32,6 +30,10 @@ public class CoController extends Thread {
     private Couser user;
 
     private String actualView;
+    private CoDownSignal downSignal;
+    private CoDownloader downloader;
+    private Thread downloadThread;
+    private CoDownloadMenu download;
 
     public CoDB getCoDB() {
         return coDB;
@@ -53,11 +55,18 @@ public class CoController extends Thread {
         this.events = events;
     }
 
+    public HashMap<String, CoInterface> getViews() {
+        return views;
+    }
+
     public CoController() throws SQLException, IOException {
         Path dir = new File(Config.root).toPath();
 
-        this.coDB = new CoDB();
-        this.watcher = new CoWatcher(dir, true, this);
+        coDB = new CoDB();
+        coserver = new Coserver();
+        watcher = new CoWatcher(dir, true, this);
+        downSignal = new CoDownSignal();
+        downloader = new CoDownloader(downSignal, this);
 
         events = new Stack<>();
         views  = new HashMap<>();
@@ -144,6 +153,20 @@ public class CoController extends Thread {
         }
     }
 
+    public void showView(String view) throws InterruptedException {
+        try {
+            if(!views.containsKey(view) && view.equals("main"))       { views.put("main",  new CoMainMenu(this)); }
+            else if(!views.containsKey(view) && view.equals("managefiles")) { views.put("managefiles",  new CoFileMenu(this)); }
+            else if(!views.containsKey(view) && view.equals("downloads")) { views.put("downloads",  new CoDownloadMenu(this)); }
+
+            views.get(view).setVisible(true);
+            views.get(view).update();
+
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
     public void logIn(String name, String password) throws Exception {
 
         try {
@@ -153,10 +176,10 @@ public class CoController extends Thread {
 
             if (user.exist()) {
                 user.retrieveCosystems();
-                CoDownSignal downSignal = new CoDownSignal();
-                Runnable downloader = new CoDownloader(downSignal, this);
-                Thread downloadThread = new Thread(downloader);
+                downloadThread = new Thread(downloader);
                 downloadThread.start();
+
+                downloader.getLastDB();
 
                 switchView("main");
             } else {
@@ -181,8 +204,8 @@ public class CoController extends Thread {
         try {
             System.out.println("Init Application");
 
-            Runnable server = new Coserver();
-            Thread threadServer= new Thread(server);
+            coserver = new Coserver();
+            Thread threadServer = new Thread(coserver);
             threadServer.start();
 
             long startTime = System.currentTimeMillis();
@@ -194,14 +217,9 @@ public class CoController extends Thread {
                     " SUPPRESSED         BOOLEAN,"+
                     " MODIFIEDAT  INTEGER);CREATE INDEX `index_path` ON `FILES` (`PATH`);CREATE INDEX `index_id` ON `FILES` (`ID`);";
             coDB.update(sql);
+
             coDB.prepareInsertBatch(coDB.insertFileSQL);
             coDB.prepareUpdateBatch(coDB.updateFileSQL);
-
-            /*InetAddress address = InetAddress.getByName("10.33.1.247");
-            Socket connection = new Socket(address, 8080);
-            Runnable client=new Controllers.Cosocket(connection,0);
-            Thread threadClient= new Thread(client);
-            threadClient.start();*/
 
             coDB.executeBatchInsert();
             coDB.executeBatchUpdate();

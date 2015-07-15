@@ -112,8 +112,22 @@ public class CoMainMenu extends CoInterface{
         });
         editFiles.setAlignmentX(LEFT_ALIGNMENT);
 
+        final JButton downloads = new JButton("Téléchargements");
+        downloads.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    controller.showView("downloads");
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
+        downloads.setAlignmentX(LEFT_ALIGNMENT);
+
         toolBar = new JToolBar();
         toolBar.add(editFiles);
+        toolBar.add(downloads);
         toolBar.add(Box.createHorizontalGlue());
         toolBar.add(quit);
 
@@ -140,7 +154,12 @@ public class CoMainMenu extends CoInterface{
             Box sys = Box.createVerticalBox();
             sys.setAlignmentX(RIGHT_ALIGNMENT);
             sys.setAlignmentY(TOP_ALIGNMENT);
-            sys.setBackground(Color.WHITE);
+
+            if(system.getOnline())
+                sys.setBackground(Color.WHITE);
+            else
+                sys.setBackground(Color.GRAY);
+
             sys.setBorder(new EmptyBorder(0,3,5,5));
 
             sys.setMaximumSize(new Dimension((int) east.getWidth() - 10, (int) (east.getHeight() / 5 - 10)));

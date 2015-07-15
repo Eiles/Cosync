@@ -4,6 +4,7 @@ public class Cosystem {
     String ip;
     String name;
     String key;
+    Boolean online;
 
 
     public Cosystem(String ip, String key, String name)
@@ -11,6 +12,7 @@ public class Cosystem {
         this.ip = ip;
         this.key = key;
         this.name = name;
+        this.online = true;
     }
 
     public String getIp()
@@ -42,5 +44,13 @@ public class Cosystem {
     public void setKey(String key)
     {
         this.key = key;
+    }
+
+    public Boolean getOnline() {
+        return online;
+    }
+
+    public void setOnline(Boolean online) {
+        this.online = online;
     }
 }
