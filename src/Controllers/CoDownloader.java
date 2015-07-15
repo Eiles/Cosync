@@ -1,15 +1,23 @@
 package Controllers;
 
+import Interface.CoFileMenu;
 import Interface.CoMainMenu;
+import Models.Cofile;
 import Models.Cosystem;
 import Models.Couser;
+import com.sun.org.apache.xpath.internal.SourceTree;
 
 import javax.swing.*;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.file.Path;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by elie on 19/06/15.
@@ -18,6 +26,8 @@ public class CoDownloader implements Runnable{
 
     ArrayList<CoSignal> socketArray=new ArrayList<>();
     ArrayList<CoSignal> socketsToUse=new ArrayList<>();
+    private Map<String, CoDB> dbSockets;
+
     long downloadStart;
     int blockState[]=null;
     CoDownSignal downSignal;
@@ -31,6 +41,7 @@ public class CoDownloader implements Runnable{
     public void run() {
         try {
             System.out.println("Start CoDownloader");
+            dbSockets = new HashMap<>();
 
             initSockets();
             while (true){
@@ -68,6 +79,9 @@ public class CoDownloader implements Runnable{
                 Thread threadClient = new Thread(client);
                 threadClient.start();
                 socketArray.add(signal);
+
+                Thread.sleep(500);
+                getLastDB(signal, system);
             }
             catch (SocketException e) {
                 controller.getUser().getCosystems().get(i).setOnline(false);
@@ -75,14 +89,44 @@ public class CoDownloader implements Runnable{
             }
         }
 
+        Thread.sleep(500);
+        getNewFiles();
+
         System.out.println("Found "+ socketArray.size()+"sockets");
     }
 
-    public void getLastDB() throws Exception{
+    public void getLastDB(CoSignal signal, Cosystem system) throws Exception {
         System.out.println("Get Last DB");
 
-        for(CoSignal signal: socketArray) {
-            signal.addRequest("getDB");
+        signal.addRequest("getDB:"+system.getKey());
+
+        Thread.sleep(500);
+        dbSockets.put(system.getKey(), new CoDB(system.getKey()));
+    }
+
+    //TODO: Finir fonction
+    public void getNewFiles() throws SQLException {
+        System.out.println("Get New Files");
+        long dateSocket;
+        File file;
+
+        for(String system: dbSockets.keySet()) {
+            System.out.println("New Files for "+system);
+            ArrayList<Cofile> newFiles = new ArrayList<>();
+
+            int i = 1;
+            try {
+                while((file = new File(dbSockets.get(system).getFilePathById(i))) != null) {
+                    System.out.println("File => "+file.getPath());
+                    dateSocket = dbSockets.get(system).getDateForFile(file.getPath(), "");
+
+                    i++;
+                }
+            } catch (Exception e) {
+
+            }
+
+
         }
     }
 

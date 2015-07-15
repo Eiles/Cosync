@@ -71,8 +71,10 @@ public class Cosocket implements Runnable {
                     }
 
                     System.out.println(process);
+
+                    if(args != null)
                     for(i=0;i<args.length;i++){
-                        System.out.print(args[i]);
+                        System.out.println("arg " + i + " =>" + args[i]);
                     }
                     toRead=0;
                     //Handle request
@@ -137,18 +139,18 @@ public class Cosocket implements Runnable {
         int cpt=0;
         dos.writeInt((int) fic.length());
         dos.flush();
-        System.out.println((int)fic.length());
+        System.out.println("length: "+(int)fic.length());
         while ((byte_ = bis.read()) != -1){
             bos.write(byte_);
             cpt++;
         }
-        System.out.println(cpt);
+        System.out.println("cpt:"+cpt);
         bos.flush();
         this.sharedSignal.setBusy(false);
     }
 
     public void sendFileInfo(String[] path) throws IOException, NoSuchAlgorithmException {
-        System.out.println("getFileInfo for "+path+" received ");
+        System.out.println("getFileInfo for "+path[0]+" received ");
         Cofile file=new Cofile(path[0],0,false);
         file.generateHash();
         file.generateBlockHash();
@@ -223,8 +225,40 @@ public class Cosocket implements Runnable {
             }
             getBlock(args);
         }
+
+        if(request.contains("getDB")) {
+            String[] args=request.split(":");
+            getDB(args[1]);
+        }
+
         this.sharedSignal.setBusy(false);
 
+    }
+
+    public void getDB(String db) throws IOException {
+        System.out.println("Waiting for DB of "+db);
+        DataInputStream dis = new DataInputStream(connection.getInputStream());
+        FileOutputStream fis = new FileOutputStream(db+".db");
+        Cofile cofile = null;
+
+        int bufferSize = dis.readInt();
+        byte[] buffer = new byte[bufferSize];
+        try {
+            while((dis.read(buffer) > 0)) {
+                fis.write(buffer);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            fis.close();
+            dis.close();
+        }
+        try {
+            this.sharedSignal.setFileInfo(cofile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void getFileInfo() throws IOException {

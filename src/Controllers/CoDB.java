@@ -6,14 +6,23 @@ import java.sql.*;
 public class CoDB {
 
         Connection c = null;
-        PreparedStatement insertBatch;
-        PreparedStatement updateBatch;
+        PreparedStatement insertFileBatch;
+        PreparedStatement updateFileBatch;
+        PreparedStatement insertLastDBBatch;
+        PreparedStatement updateLastDBBatch;
         String insertFileSQL = "INSERT INTO FILES"
             + "(PATH,DATE,SUPPRESSED,MODIFIEDAT) VALUES"
             + "(?,?,?,?)";
 
         String updateFileSQL = "UPDATE FILES "
             + "SET DATE=?, SUPPRESSED=?, MODIFIEDAT=? WHERE PATH=?" ;
+
+        String insertLastDBSQL = "INSERT INTO LASTDB"
+            + "(SYSTEM, UPDATEDATE) VALUES"
+            + "(?,?)";
+
+        String updateLastDBSQL = "UPDATE LASTDB " +
+                "SET UPDATEDATE=? WHERE SYSTEM=?";
 
         int insertSize=0;
         int updateSize=0;
@@ -23,6 +32,19 @@ public class CoDB {
             try {
                 Class.forName("org.sqlite.JDBC");
                 c = DriverManager.getConnection("jdbc:sqlite:cosync.db");
+            } catch ( Exception e ) {
+                System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+                System.exit(0);
+            }
+            System.out.println("Opened database successfully");
+            c.setAutoCommit(false);
+        }
+
+        CoDB(String name)
+            throws SQLException {
+            try {
+                Class.forName("org.sqlite.JDBC");
+                c = DriverManager.getConnection("jdbc:sqlite:"+name+".db");
             } catch ( Exception e ) {
                 System.err.println( e.getClass().getName() + ": " + e.getMessage() );
                 System.exit(0);
@@ -144,20 +166,30 @@ public class CoDB {
 
     public void prepareInsertBatch(String sql)
             throws SQLException {
-        this.insertBatch=c.prepareStatement(sql);
+        this.insertFileBatch =c.prepareStatement(sql);
     }
     public void prepareUpdateBatch(String sql)
             throws SQLException {
-        this.updateBatch=c.prepareStatement(sql);
+        this.updateFileBatch =c.prepareStatement(sql);
+    }
+
+    public void prepareUpdateLastDBBatch(String sql)
+            throws SQLException {
+        this.updateLastDBBatch=c.prepareStatement(sql);
+    }
+
+    public void prepareInsertLastDBBatch(String sql)
+            throws SQLException {
+        this.updateLastDBBatch=c.prepareStatement(sql);
     }
 
     public void addForBatchInsert(String path,String name, long date,int suppressed)
             throws SQLException {
-            insertBatch.setString(1, path);
-            insertBatch.setLong(2, date);
-            insertBatch.setInt(3, suppressed);
-            insertBatch.setLong(4, System.currentTimeMillis());
-            insertBatch.addBatch();
+            insertFileBatch.setString(1, path);
+            insertFileBatch.setLong(2, date);
+            insertFileBatch.setInt(3, suppressed);
+            insertFileBatch.setLong(4, System.currentTimeMillis());
+            insertFileBatch.addBatch();
             insertSize++;
 
         }
@@ -166,21 +198,21 @@ public class CoDB {
                 throws SQLException {
             if(this.getInsertSize() == 0)
                 return;
-            insertBatch.executeBatch();
+            insertFileBatch.executeBatch();
             c.commit();
             this.setInsertSize(0);
-            insertBatch.close();
+            insertFileBatch.close();
             prepareInsertBatch(insertFileSQL);
         }
 
         public void addForBatchUpdate(String path, long date)
                 throws SQLException {
-            updateBatch.setLong(1, date);
-            updateBatch.setInt(2,0);
-            updateBatch.setLong(3, System.currentTimeMillis());
-            updateBatch.setString(4, path);
+            updateFileBatch.setLong(1, date);
+            updateFileBatch.setInt(2, 0);
+            updateFileBatch.setLong(3, System.currentTimeMillis());
+            updateFileBatch.setString(4, path);
 
-            updateBatch.addBatch();
+            updateFileBatch.addBatch();
             updateSize++;
         }
 
@@ -188,12 +220,48 @@ public class CoDB {
                 throws SQLException {
             if(this.getUpdateSize() == 0)
                 return;
-            updateBatch.executeBatch();
+            updateFileBatch.executeBatch();
             c.commit();
             this.setUpdateSize(0);
-            updateBatch.close();
+            updateFileBatch.close();
             prepareUpdateBatch(updateFileSQL);
         }
+
+    public void addForBatchLastDBUpdate(String system)
+            throws SQLException {
+        updateLastDBBatch.setLong(1, System.currentTimeMillis());
+        updateLastDBBatch.setString(2, system);
+        updateLastDBBatch.addBatch();
+    }
+
+    public void executeBatchLastDBUpdate()
+            throws SQLException {
+        if(this.getInsertSize() == 0)
+            return;
+        updateLastDBBatch.executeBatch();
+        c.commit();
+        this.setInsertSize(0);
+        updateLastDBBatch.close();
+        prepareUpdateLastDBBatch(updateLastDBSQL);
+    }
+
+    public void executeBatchLastDBInsert()
+            throws SQLException {
+        if(this.getInsertSize() == 0)
+            return;
+        insertLastDBBatch.executeBatch();
+        c.commit();
+        this.setInsertSize(0);
+        insertLastDBBatch.close();
+        prepareUpdateLastDBBatch(insertLastDBSQL);
+    }
+
+    public void addForBatchLastDBInsert(String system)
+            throws SQLException {
+        updateLastDBBatch.setLong(1, System.currentTimeMillis());
+        updateLastDBBatch.setString(2, system);
+        updateLastDBBatch.addBatch();
+    }
 
         public String getFilePathById(int id) throws Exception {
             Statement stmt=null;

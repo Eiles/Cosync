@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.nio.file.WatchEvent;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 import static java.nio.file.StandardWatchEventKinds.*;
@@ -179,8 +180,6 @@ public class CoController extends Thread {
                 downloadThread = new Thread(downloader);
                 downloadThread.start();
 
-                downloader.getLastDB();
-
                 switchView("main");
             } else {
                 JOptionPane.showMessageDialog(null, "L'utilisateur renseigné n'existe pas");
@@ -218,11 +217,24 @@ public class CoController extends Thread {
                     " MODIFIEDAT  INTEGER);CREATE INDEX `index_path` ON `FILES` (`PATH`);CREATE INDEX `index_id` ON `FILES` (`ID`);";
             coDB.update(sql);
 
+            sql = "CREATE TABLE LASTDB "+
+                    "(" +
+                    "ID INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "SYSTEM     CHAR(255)," +
+                    "UPDATEDATE      INTEGER" +
+                    "); CREATE INDEX `index_system` ON `LASTDB` (`SYSTEM`);CREATE INDEX `index_id` ON `LASTDB` (`ID`);";
+            coDB.update(sql);
+
             coDB.prepareInsertBatch(coDB.insertFileSQL);
             coDB.prepareUpdateBatch(coDB.updateFileSQL);
+            coDB.prepareUpdateLastDBBatch(coDB.updateLastDBSQL);
+            coDB.prepareInsertLastDBBatch(coDB.insertLastDBSQL);
 
             coDB.executeBatchInsert();
             coDB.executeBatchUpdate();
+            coDB.executeBatchLastDBInsert();
+            coDB.executeBatchLastDBUpdate();
+
             long endTime   = System.currentTimeMillis();
             long totalTime = endTime - startTime;
             System.out.println("totalTime => "+totalTime);
@@ -233,6 +245,7 @@ public class CoController extends Thread {
 
             return true;
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
