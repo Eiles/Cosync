@@ -2,14 +2,21 @@
 	require_once 'tool.php';
 	require_once 'user.php';
 	displayHTMLHeader("Creation de compte");
-	deconnection("http://localhost/coSync/creation.php");
+	//deconnection("http://localhost/coSync/creation.php");
+	echo "<form method=\"post\" action=\"http://localhost/coSync/creation.php\">
+			<input class=\"btn btn-danger\" type=\"submit\" name=\"deconnection\" value=\"Retour à l'accueil\">
+		</form>";
+		
+		if(isset($_POST["deconnection"])){
+			header("Location: http://localhost/coSync/accueil.php");
+		}
 ?>
 	<h1>Bienvenue et merci de créér un compte chez nous.</h1>
-	<br><br><br><br>
+	<br><br>
 	<form method="post" action="creation.php">
-		<strong>Renseigner votre adresse mail</strong> <input type="text" name="username">
-		<strong>Renseigner votre mot de passe</strong> <input type="password" name="password">
-		<input type="submit" value="Entrer">
+		<h3>Renseignez votre adresse mail</h3> <input type="text" name="username"><br>
+		<h3>Renseignez votre mot de passe</h3> <input type="password" name="password"><br><br>
+		<input class="btn btn-primary" type="submit" value="Créer votre compte">
 	</form>
 <?php
 	if (isset($_POST["username"]) && isset($_POST["password"])){
