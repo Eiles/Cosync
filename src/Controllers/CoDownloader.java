@@ -100,13 +100,24 @@ public class CoDownloader implements Runnable{
         System.out.println("Get Last DB");
 
         signal.addRequest("getDB:"+system.getKey());
-        dbSockets.put(system.getKey(), new CoDB(system.getKey()));
+        long startTime = System.currentTimeMillis();
+        while(!hasDB(signal)){
+            if(System.currentTimeMillis()-startTime>5000){
+                break;
+            }
+        }
+        if(hasDB(signal)){
+            System.out.println("DB downloaded");
+            dbSockets.put(system.getKey(), new CoDB(system.getKey()));
+        }
+
     }
 
     //TODO: Finir fonction
     public void getNewFiles() throws SQLException {
         System.out.println("Get New Files");
         CoDB compareDB=null;
+        ResultSet files;
 
         for(String system: dbSockets.keySet()) {
             compareDB=dbSockets.get(system);
@@ -114,7 +125,7 @@ public class CoDownloader implements Runnable{
 
             int i = 1;
             try {
-                ResultSet files = compareDB.getFiles();
+                files = compareDB.getFiles();
                 while(files.next()) {
                     System.out.println("Check file "+ files.getString("PATH"));
                     if(controller.getCoDB().getDateForFile(files.getString("PATH")) == 0) {
@@ -132,9 +143,16 @@ public class CoDownloader implements Runnable{
                 e.printStackTrace();
             }
         }
+
+        files = controller.getCoDB().getFiles();
+        while(files.next()) {
+            if(files.getInt("NEEDDOWNLOAD") == 1) {
+                this.downSignal.addRequest(files.getString("PATH"));
+            }
+        }
     }
 
-    public void getFile(String path) throws InterruptedException {
+    public void getFile(String path) throws InterruptedException, SQLException {
         for(int i=0;i<socketsToUse.size();i++){
             socketsToUse.get(i).addRequest("getFile:" + path);
         }
@@ -199,12 +217,15 @@ public class CoDownloader implements Runnable{
             Thread.sleep(200);
         }
         new File(Config.root+"/"+socketsToUse.get(0).getFileInfo().getPath()).setLastModified(socketsToUse.get(0).getFileInfo().getModDate());
+        controller.getCoDB().update("UPDATE FILES SET NEEDDOWNLOAD = 0 WHERE PATH ='"+socketsToUse.get(0).getFileInfo().getPath()+"'");
+
         System.out.println("File downloaded in : "+(System.currentTimeMillis()-downloadStart)/1000+" sec 2");
         socketsToUse=new ArrayList<CoSignal>();
     }
 
     public void getSocketsForFile(String path){
         for(int i=0;i<socketArray.size();i++){
+            System.out.println("Array Size : "+socketArray.size());
             socketArray.get(i).addRequest("hasFile:" + path);
         }
         long startTime = System.currentTimeMillis();
@@ -257,6 +278,10 @@ public class CoDownloader implements Runnable{
             }
         }
         return true;
+    }
+
+    public boolean hasDB(CoSignal signal){
+        return signal.getdbDownload();
     }
 
 }

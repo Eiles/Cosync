@@ -223,7 +223,7 @@ public class CoController extends Thread {
                     "ID INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "SYSTEM     CHAR(255)," +
                     "UPDATEDATE      INTEGER" +
-                    "); CREATE INDEX `index_system` ON `LASTDB` (`SYSTEM`);CREATE INDEX `index_id` ON `LASTDB` (`ID`);";
+                    ");";
             coDB.update(sql);
 
             coDB.prepareInsertBatch(coDB.insertFileSQL);

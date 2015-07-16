@@ -1,6 +1,6 @@
 package Controllers;
 
 public interface Config {
-    public String root="C://Users//Alban//Cosync";
+    public String root="/Users/elie/Cosync";
 
 }

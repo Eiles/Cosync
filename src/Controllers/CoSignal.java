@@ -14,7 +14,15 @@ public class CoSignal {
     protected int blockState[]=null;
     protected boolean busy=false;
     protected HashMap <String,Boolean> hasfile=new HashMap<>();
+    protected boolean dbDownload=false;
 
+    public synchronized boolean getdbDownload() {
+        return dbDownload;
+    }
+
+    public synchronized void setdbDownload(boolean dbDownload) {
+        this.dbDownload= dbDownload;
+    }
     public synchronized Cofile getFileInfo() {
         return fileInfo;
     }

@@ -49,12 +49,14 @@ public class Cosocket implements Runnable {
                 if(dis.available()>0){
                     toRead=dis.readInt();
                     System.out.println("Reading");
+                    System.out.println(toRead);
                     if(toRead>0){
                         request=new byte[toRead];
                     }else{
-                        break;
+                        continue;
                     }
                     while(i<toRead){
+                        System.out.println(i);
                         request[i]=dis.readByte();
                         i++;
                     }
@@ -146,6 +148,7 @@ public class Cosocket implements Runnable {
         }
         System.out.println("cpt:"+cpt);
         bos.flush();
+
         this.sharedSignal.setBusy(false);
     }
 
@@ -230,35 +233,38 @@ public class Cosocket implements Runnable {
             String[] args=request.split(":");
             getDB(args[1]);
         }
+        if(request.contains("hasFile:")){
+            System.out.println("Request sent : "+request);
+        }
 
         this.sharedSignal.setBusy(false);
 
     }
 
     public void getDB(String db) throws IOException {
+        this.sharedSignal.setBusy(true);
         System.out.println("Waiting for DB of "+db);
         DataInputStream dis = new DataInputStream(connection.getInputStream());
         FileOutputStream fis = new FileOutputStream(db+".db");
-        Cofile cofile = null;
-
+        int i=0;
         int bufferSize = dis.readInt();
+        System.out.println("Buffer size : "+bufferSize);
         byte[] buffer = new byte[bufferSize];
         try {
-            while((dis.read(buffer) > 0)) {
-                fis.write(buffer);
+            while(i<bufferSize){
+                buffer[i]=dis.readByte();
+                i++;
             }
+            fis.write(buffer);
         } catch (Exception e) {
             e.printStackTrace();
         }
         finally {
+            fis.flush();
             fis.close();
-            dis.close();
         }
-        try {
-            this.sharedSignal.setFileInfo(cofile);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.sharedSignal.setdbDownload(true);
+        this.sharedSignal.setBusy(false);
     }
 
     public void getFileInfo() throws IOException {
@@ -309,8 +315,6 @@ public class Cosocket implements Runnable {
     public void sendBlock(String[] args) throws IOException, InterruptedException {
 
         RandomAccessFile raf=new RandomAccessFile(Config.root+"/"+args[0],"r");
-        BufferedInputStream bis = new BufferedInputStream(connection.getInputStream());
-
         byte[] block=new byte[1024*1024];
         raf.seek(1024*1024*Integer.parseInt(args[1]));
         int read=raf.read(block,0,block.length);
@@ -320,6 +324,7 @@ public class Cosocket implements Runnable {
         System.out.println("Sent int for block : "+read);
         dos.write(block);
         dos.flush();
+        this.sharedSignal.setBusy(false);
 
     }
 
