@@ -28,13 +28,13 @@
 		//Creation of a dynamic table in which every system will be displayed
 		echo "<table class =\"table table-bordered\">";
 		for($i = 0; $i < count($systems); $i++){
-			echo "<tr><td><strong>Numéro de l'équipement</strong><td><strong>Dernière adresse IP connue</strong></td><td><strong>Changement de visibilité de l'équipement</strong></tr>";
+			echo "<tr><td><strong>Numéro de l'équipement</strong><td><strong>Dernière adresse IP connue</strong></td><td><strong>Visibilité de l'équipement (cliquez pour changer)</strong></tr>";
 			echo "<td># ".$i."</td><td>".$systems[$i]->last_ip."</td><td class=\"text-justify\">";
 			
 			//If the system is register, display a button to unregister the system for the client
 			if($systems[$i]->is_register){
-				systems_button("Unvisible", $i);
-				if(isset($_POST["Unvisible".$i])){
+				systems_button("Visible", $i);
+				if(isset($_POST["Visible".$i])){
 					updateSystemRegistration($systems[$i]->id, 0);
 					//Reset the state of the button in order to avoid other modification and reload the page
 					unset($_POST["Unvisible".$i]);
@@ -43,8 +43,8 @@
 				}
 			}else{
 				//Same here but if the system is not register
-				systems_button("Visible", $i);
-				if(isset($_POST["Visible".$i])){
+				systems_button("Unvisible", $i);
+				if(isset($_POST["Unvisible".$i])){
 					updateSystemRegistration($systems[$i]->id, 1);
 					unset($_POST["Visible".$i]);
 					unset($_POST["Unvisible".$i]);
