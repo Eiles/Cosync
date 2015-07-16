@@ -80,8 +80,9 @@ public class CoDownloader implements Runnable{
                 threadClient.start();
                 socketArray.add(signal);
 
-                Thread.sleep(500);
+                //TODO: Deplacer getLastDB
                 getLastDB(signal, system);
+                Thread.sleep(500);
             }
             catch (SocketException e) {
                 controller.getUser().getCosystems().get(i).setOnline(false);
@@ -99,34 +100,37 @@ public class CoDownloader implements Runnable{
         System.out.println("Get Last DB");
 
         signal.addRequest("getDB:"+system.getKey());
-
-        Thread.sleep(500);
         dbSockets.put(system.getKey(), new CoDB(system.getKey()));
     }
 
     //TODO: Finir fonction
     public void getNewFiles() throws SQLException {
         System.out.println("Get New Files");
-        long dateSocket;
-        File file;
+        CoDB compareDB=null;
 
         for(String system: dbSockets.keySet()) {
+            compareDB=dbSockets.get(system);
             System.out.println("New Files for "+system);
-            ArrayList<Cofile> newFiles = new ArrayList<>();
 
             int i = 1;
             try {
-                while((file = new File(dbSockets.get(system).getFilePathById(i))) != null) {
-                    System.out.println("File => "+file.getPath());
-                    dateSocket = dbSockets.get(system).getDateForFile(file.getPath(), "");
-
-                    i++;
+                ResultSet files = compareDB.getFiles();
+                while(files.next()) {
+                    System.out.println("Check file "+ files.getString("PATH"));
+                    if(controller.getCoDB().getDateForFile(files.getString("PATH")) == 0) {
+                        System.out.println("Add new file");
+                        controller.getCoDB().update("INSERT INTO FILES(PATH,DATE,SUPPRESSED, NEEDDOWNLOAD, MODIFIEDAT) VALUES ('" + files.getString("PATH") + "'," + files.getString("DATE") + ","+(files.getInt("SUPPRESSED")>0?"0":"1")+","+(files.getInt("SUPPRESSED")>0?"0":"1")+"," + files.getString("MODIFIEDAT") + ")");
+                }
+                    else{
+                        if(controller.getCoDB().getDateForFile(files.getString("PATH")) < files.getLong("DATE")){
+                                System.out.println("Update file");
+                                controller.getCoDB().update("UPDATE FILES SET NEEDDOWNLOAD="+(files.getInt("SUPPRESSED")>0?"0":"1")+", SUPPRESSED = "+files.getInt("SUPPRESSED")+", MODIFIEDAT =+" + files.getLong("MODIFIEDAT")+" WHERE PATH="+files.getString("PATH"));
+                        }
+                    }
                 }
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
-
-
         }
     }
 

@@ -214,7 +214,7 @@ public class CoWatcher extends Thread{
         String path= Paths.get(Config.root).relativize(file).toString();
         String filename=file.getFileName().toString();
         long datesql=fic.lastModified();
-        long olddate=db.getDateForFile(path.toString(), filename);
+        long olddate=db.getDateForFile(path.toString());
         boolean suppressed=db.getSuppressedForFile(path.toString(), filename);
         //System.out.println(cpt);
         if(olddate==0){

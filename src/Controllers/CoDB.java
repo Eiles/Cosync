@@ -99,7 +99,7 @@ public class CoDB {
         }
     }*/
 
-    public long getDateForFile(String path,String filename)
+    public long getDateForFile(String path)
             throws SQLException {
         Statement stmt = c.createStatement();
         long ret = 0;
@@ -284,7 +284,7 @@ public class CoDB {
             Statement stmt=null;
             String ret=null;
             stmt = c.createStatement();
-            ResultSet res = stmt.executeQuery("SELECT PATH FROM FILES");
+            ResultSet res = stmt.executeQuery("SELECT * FROM FILES");
             c.commit();
             //System.out.println("Query executed successfully");
             return res;

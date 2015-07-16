@@ -213,7 +213,8 @@ public class CoController extends Thread {
                     " ID INTEGER PRIMARY KEY   AUTOINCREMENT,"+
                     " PATH       CHAR(255), " +
                     " DATE        INTEGER, " +
-                    " SUPPRESSED         BOOLEAN,"+
+                    " SUPPRESSED         BOOLEAN," +
+                    " NEEDDOWNLOAD      BOOLEAN  DEFAULT 0,"+
                     " MODIFIEDAT  INTEGER);CREATE INDEX `index_path` ON `FILES` (`PATH`);CREATE INDEX `index_id` ON `FILES` (`ID`);";
             coDB.update(sql);
 
