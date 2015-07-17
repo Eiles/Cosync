@@ -191,7 +191,7 @@ public class CoDownloader implements Runnable{
             return;
         }
         blockState=new int[socketsToUse.get(0).getBlockState().length];
-        System.out.println(blockState.length);
+        System.out.println("Nombre de block : "+blockState.length);
         for(int i=0;i<blockState.length;i++){
             blockState[i]=0;
         }
@@ -200,7 +200,7 @@ public class CoDownloader implements Runnable{
             for(int i=0;i<socketsToUse.size();i++){
                 if(!socketsToUse.get(i).getBusy()){
                     for(int j=0;j<blockState.length;j++){
-                        if(socketsToUse.get(i).blockState[j] == 2){
+                         if(socketsToUse.get(i).getBlockState()[j] == 2){
                             blockState[j]=2;
                         }
                     }
@@ -220,6 +220,9 @@ public class CoDownloader implements Runnable{
         controller.getCoDB().update("UPDATE FILES SET NEEDDOWNLOAD = 0 WHERE PATH ='"+socketsToUse.get(0).getFileInfo().getPath()+"'");
 
         System.out.println("File downloaded in : "+(System.currentTimeMillis()-downloadStart)/1000+" sec 2");
+        for(int i=0;i<socketArray.size();i++){
+            socketArray.get(i).setFileInfo(null);
+        }
         socketsToUse=new ArrayList<CoSignal>();
     }
 

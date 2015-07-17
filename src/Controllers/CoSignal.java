@@ -27,9 +27,14 @@ public class CoSignal {
         return fileInfo;
     }
 
+    public synchronized void resetBlockState(int size){
+        this.blockState=new int[size];
+    }
+
     public synchronized void setFileInfo(Cofile fileInfo) {
         System.out.println("Fileinfo setted");
-        this.blockState=new int[fileInfo.blockHash.length];
+        if(fileInfo!=null)
+            resetBlockState(fileInfo.blockHash.length);
         this.fileInfo = fileInfo;
     }
     public synchronized int[] getBlockState() {

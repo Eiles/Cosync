@@ -277,7 +277,9 @@ public class Cosocket implements Runnable {
             e.printStackTrace();
         }
         try {
+            System.out.println(cofile.getPath()+": "+cofile.getHexHash());
             this.sharedSignal.setFileInfo(cofile);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
