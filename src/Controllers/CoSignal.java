@@ -15,14 +15,23 @@ public class CoSignal {
     protected boolean busy=false;
     protected HashMap <String,Boolean> hasfile=new HashMap<>();
     protected boolean dbDownload=false;
+    protected CoDB coDB;
+
+    public synchronized CoDB getCoDB() {
+        return coDB;
+    }
+
+    public synchronized void setCoDB(CoDB coDB) {
+        this.coDB = coDB;
+    }
 
     protected String systemKey;
 
-    public String getSystemKey() {
+    public synchronized String getSystemKey() {
         return systemKey;
     }
 
-    public void setSystemKey(String systemKey) {
+    public synchronized void setSystemKey(String systemKey) {
         this.systemKey = systemKey;
     }
 

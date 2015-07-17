@@ -148,6 +148,16 @@ public class CoDB {
         }
     }
 
+    public ResultSet getModifiedFiles(long date) throws SQLException {
+        Statement stmt=null;
+        String ret=null;
+        stmt = c.createStatement();
+        ResultSet res = stmt.executeQuery("SELECT * FROM FILES WHEN MODIFIEDAT > "+date);
+        c.commit();
+        //System.out.println("Query executed successfully");
+        return res;
+    }
+
     public int getInsertSize() {
         return insertSize;
     }

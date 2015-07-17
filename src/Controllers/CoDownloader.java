@@ -72,6 +72,7 @@ public class CoDownloader implements Runnable{
             system =controller.getUser().getCosystems().get(i);
             address=InetAddress.getByName(system.getIp());
             signal.setSystemKey(system.getKey());
+            signal.setCoDB(controller.getCoDB());
 
             try {
                 Socket s=new Socket();
@@ -129,12 +130,14 @@ public class CoDownloader implements Runnable{
                             CoSignal signalAdd=new CoSignal();;
                             address=InetAddress.getByName(system.getIp());
                             signalAdd.setSystemKey(system.getKey());
+                            signalAdd.setCoDB(controller.getCoDB());
                             Socket s=new Socket();
-                            s.connect(new InetSocketAddress(address,7777), 4000);
+                            s.connect(new InetSocketAddress(address, 7777), 4000);
                             Runnable client = new Cosocket(s, 0, signalAdd);
                             Thread threadClient = new Thread(client);
                             threadClient.start();
                             socketArray.add(signalAdd);
+
                         }
                     }
 
@@ -168,6 +171,10 @@ public class CoDownloader implements Runnable{
                 System.out.println("DB downloaded");
                 dbSockets.put(system.getKey(), new CoDB(system.getKey()));
             }
+        }
+        else {
+            System.out.println("Get Modifs");
+            signal.addRequest("getModif:"+controller.getCoDB().getLastUpdate(system.getKey()));
         }
 
     }

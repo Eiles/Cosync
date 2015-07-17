@@ -3,9 +3,13 @@ package Controllers;
 import Controllers.Config;
 import Models.Cofile;
 
+import javax.xml.bind.SchemaOutputResolver;
+import java.awt.image.DataBuffer;
 import java.net.*;
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
 public class Cosocket implements Runnable {
@@ -114,6 +118,10 @@ public class Cosocket implements Runnable {
                 sendDataBase();
                 break;
             }
+            case "getModif" : {
+                sendModif(Long.parseLong(args[0]));
+                break;
+            }
             case "getFile" :{
                 sendFileInfo(args);
                 break;
@@ -133,6 +141,37 @@ public class Cosocket implements Runnable {
             }
         }
     }
+
+    public void sendModif(long modifDate) throws IOException{
+        System.out.println("getModif recu");
+        System.out.println("date "+modifDate);
+        ResultSet results;
+
+        try {
+            results = sharedSignal.getCoDB().getModifiedFiles(modifDate);
+
+            DataOutputStream dos = new DataOutputStream(connection.getOutputStream());
+            BufferedOutputStream bos = new BufferedOutputStream(dos);
+
+            StringBuffer sb = new StringBuffer();
+
+            while(results.next()) {
+                sb.append(results.getString("PATH")+":"+results.getInt("SUPPRESSED")+":"+results.getLong("MODIFIEDAT")+"\n");
+            }
+
+            byte[] b = sb.toString().getBytes("UTF-8");
+            dos.writeInt(b.length);
+            System.out.println("Size sent : "+b.length);
+            bos.write(b);
+            bos.flush();
+
+            this.sharedSignal.setBusy(false);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void sendDataBase() throws IOException {
         System.out.println("getDB recu");
         File fic=new File("cosync.db");
@@ -239,9 +278,39 @@ public class Cosocket implements Runnable {
         if(request.contains("hasFile:")){
             System.out.println("Request sent : " + request);
         }
+        if(request.contains("getModif")) {
+            String[] args=request.split(":");
+            getModif();
+        }
 
         this.sharedSignal.setBusy(false);
 
+    }
+
+    public void getModif() throws IOException {
+        this.sharedSignal.setBusy(true);
+        System.out.println("Waiting for Modified files");
+        DataInputStream dis = new DataInputStream(connection.getInputStream());
+        FileOutputStream fos = new FileOutputStream(sharedSignal.getSystemKey()+"_modif");
+        int i=0;
+        int bufferSize = dis.readInt();
+        System.out.println("Buffer size : "+bufferSize);
+        byte[] buffer = new byte[bufferSize];
+        try {
+            while(i<bufferSize){
+                buffer[i]=dis.readByte();
+                i++;
+            }
+            fos.write(buffer);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            fos.flush();
+            fos.close();
+        }
+        this.sharedSignal.setdbDownload(true);
+        this.sharedSignal.setBusy(false);
     }
 
     public void getDB(String db) throws IOException {
