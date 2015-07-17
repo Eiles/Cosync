@@ -177,6 +177,10 @@ public class CoController extends Thread {
 
             if (user.exist()) {
                 user.retrieveCosystems();
+
+                /*if(downloadThread.isAlive ()) {
+                    downloadThread.
+                }*/
                 downloadThread = new Thread(downloader);
                 downloadThread.start();
 

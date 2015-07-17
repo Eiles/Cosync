@@ -15,6 +15,7 @@ public class Cosocket implements Runnable {
     private boolean auth;
     public CoSignal sharedSignal;
     private Cofile cofile;
+    private Thread currentThread;
 
     public Cosocket(Socket s, int i, CoSignal signal) {
         this.connection = s;
@@ -25,6 +26,8 @@ public class Cosocket implements Runnable {
 
     public void run() {
         try {
+            currentThread = Thread.currentThread();
+
             //Input stream from the socket
             BufferedInputStream bis = new BufferedInputStream(connection.getInputStream());
             DataInputStream dis=new DataInputStream(bis);
@@ -122,6 +125,7 @@ public class Cosocket implements Runnable {
             }
             case "close" : {
                     connection.close();
+                    currentThread.interrupt();
                     break;
             }
             case "hasFileResponse" : {
@@ -234,7 +238,7 @@ public class Cosocket implements Runnable {
             getDB(args[1]);
         }
         if(request.contains("hasFile:")){
-            System.out.println("Request sent : "+request);
+            System.out.println("Request sent : " + request);
         }
 
         this.sharedSignal.setBusy(false);
@@ -277,7 +281,7 @@ public class Cosocket implements Runnable {
             e.printStackTrace();
         }
         try {
-            System.out.println(cofile.getPath()+": "+cofile.getHexHash());
+            System.out.println(cofile.getPath() + ": " + cofile.getHexHash());
             this.sharedSignal.setFileInfo(cofile);
 
         } catch (Exception e) {
@@ -323,7 +327,7 @@ public class Cosocket implements Runnable {
         BufferedOutputStream bos=new BufferedOutputStream(connection.getOutputStream());
         DataOutputStream dos=new DataOutputStream(bos);
         dos.writeInt(read);
-        System.out.println("Sent int for block : "+read);
+        System.out.println("Sent int for block : " + read);
         dos.write(block);
         dos.flush();
         this.sharedSignal.setBusy(false);

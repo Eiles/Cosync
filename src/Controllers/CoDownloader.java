@@ -50,7 +50,7 @@ public class CoDownloader implements Runnable{
                     String request=downSignal.getRequest();
                     getSocketsForFile(request);
                     if(socketsToUse.size()<1){
-                        initSockets();
+                        refreshSockets();
                     }
                     getFile(request);
                 }
@@ -72,6 +72,7 @@ public class CoDownloader implements Runnable{
             signal=new CoSignal();
             system =controller.getUser().getCosystems().get(i);
             address=InetAddress.getByName(system.getIp());
+            signal.setSystemKey(system.getKey());
 
             try {
                 Runnable client = new Cosocket(new Socket(address, 7777), 0, signal);
@@ -93,6 +94,54 @@ public class CoDownloader implements Runnable{
         getNewFiles();
 
         System.out.println("Found "+ socketArray.size()+"sockets");
+    }
+
+    public void refreshSockets() throws Exception {
+        System.out.println("Refresh sockets");
+
+        InetAddress address;
+        Cosystem system;
+        boolean ok=true;
+        try {
+            controller.getUser().retrieveCosystems();
+
+            for(int i=0;i<controller.getUser().getCosystems().size();i++){
+                system =controller.getUser().getCosystems().get(i);
+
+                try {
+
+
+                    for(int j=0;j<socketArray.size();j++){
+                        if(system.getKey().equals(socketArray.get(j).getSystemKey())){
+                            if(!socketArray.get(j).getBusy()){
+                                socketArray.get(j).addRequest("close");
+                                socketArray.remove(j);
+
+                            }else{
+                                ok=false;
+                            }
+                        }
+                        if(ok){
+                            CoSignal signalAdd=new CoSignal();;
+                            address=InetAddress.getByName(system.getIp());
+                            signalAdd.setSystemKey(system.getKey());
+                            Runnable client = new Cosocket(new Socket(address, 7777), 0, signalAdd);
+                            Thread threadClient = new Thread(client);
+                            threadClient.start();
+                            socketArray.add(signalAdd);
+                        }
+                    }
+
+                    Thread.sleep(500);
+                }
+                catch (SocketException e) {
+                    controller.getUser().getCosystems().get(i).setOnline(false);
+                    ((CoMainMenu)controller.getViews().get("main")).updateListSystem(controller.getUser());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void getLastDB(CoSignal signal, Cosystem system) throws Exception {
@@ -220,7 +269,7 @@ public class CoDownloader implements Runnable{
             Thread.sleep(200);
         }
         new File(Config.root+"/"+socketsToUse.get(0).getFileInfo().getPath()).setLastModified(socketsToUse.get(0).getFileInfo().getModDate());
-        controller.getCoDB().update("UPDATE FILES SET NEEDDOWNLOAD = 0 WHERE PATH ='"+socketsToUse.get(0).getFileInfo().getPath()+"'");
+        controller.getCoDB().update("UPDATE FILES SET NEEDDOWNLOAD = 0 WHERE PATH ='" + socketsToUse.get(0).getFileInfo().getPath() + "'");
 
         System.out.println("File downloaded in : "+(System.currentTimeMillis()-downloadStart)/1000+" sec 2");
         for(int i=0;i<socketArray.size();i++){

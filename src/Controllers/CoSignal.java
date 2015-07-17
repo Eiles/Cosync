@@ -16,6 +16,16 @@ public class CoSignal {
     protected HashMap <String,Boolean> hasfile=new HashMap<>();
     protected boolean dbDownload=false;
 
+    protected String systemKey;
+
+    public String getSystemKey() {
+        return systemKey;
+    }
+
+    public void setSystemKey(String systemKey) {
+        this.systemKey = systemKey;
+    }
+
     public synchronized boolean getdbDownload() {
         return dbDownload;
     }
