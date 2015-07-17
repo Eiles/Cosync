@@ -94,7 +94,7 @@ public class CoController extends Thread {
 
             while (true) {
 
-                sleep(0);
+                sleep(500);
                 if (null == user) {
                     // Récupération des informations de l'utilisateur
                     String error;

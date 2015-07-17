@@ -9,9 +9,7 @@ import com.sun.org.apache.xpath.internal.SourceTree;
 
 import javax.swing.*;
 import java.io.File;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.SocketException;
+import java.net.*;
 import java.nio.file.Path;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -50,6 +48,7 @@ public class CoDownloader implements Runnable{
                     String request=downSignal.getRequest();
                     getSocketsForFile(request);
                     if(socketsToUse.size()<1){
+                        downSignal.addRequest(request);
                         refreshSockets();
                     }
                     getFile(request);
@@ -75,7 +74,9 @@ public class CoDownloader implements Runnable{
             signal.setSystemKey(system.getKey());
 
             try {
-                Runnable client = new Cosocket(new Socket(address, 7777), 0, signal);
+                Socket s=new Socket();
+                s.connect(new InetSocketAddress(address,7777), 4000);
+                Runnable client = new Cosocket(s, 0, signal);
                 Thread threadClient = new Thread(client);
                 threadClient.start();
                 socketArray.add(signal);
@@ -85,6 +86,9 @@ public class CoDownloader implements Runnable{
                 Thread.sleep(500);
             }
             catch (SocketException e) {
+                controller.getUser().getCosystems().get(i).setOnline(false);
+                ((CoMainMenu)controller.getViews().get("main")).updateListSystem(controller.getUser());
+            }catch(SocketTimeoutException te){
                 controller.getUser().getCosystems().get(i).setOnline(false);
                 ((CoMainMenu)controller.getViews().get("main")).updateListSystem(controller.getUser());
             }
@@ -125,7 +129,9 @@ public class CoDownloader implements Runnable{
                             CoSignal signalAdd=new CoSignal();;
                             address=InetAddress.getByName(system.getIp());
                             signalAdd.setSystemKey(system.getKey());
-                            Runnable client = new Cosocket(new Socket(address, 7777), 0, signalAdd);
+                            Socket s=new Socket();
+                            s.connect(new InetSocketAddress(address,7777), 4000);
+                            Runnable client = new Cosocket(s, 0, signalAdd);
                             Thread threadClient = new Thread(client);
                             threadClient.start();
                             socketArray.add(signalAdd);
@@ -135,6 +141,9 @@ public class CoDownloader implements Runnable{
                     Thread.sleep(500);
                 }
                 catch (SocketException e) {
+                    controller.getUser().getCosystems().get(i).setOnline(false);
+                    ((CoMainMenu)controller.getViews().get("main")).updateListSystem(controller.getUser());
+                }catch(SocketTimeoutException te){
                     controller.getUser().getCosystems().get(i).setOnline(false);
                     ((CoMainMenu)controller.getViews().get("main")).updateListSystem(controller.getUser());
                 }
@@ -180,7 +189,7 @@ public class CoDownloader implements Runnable{
                     System.out.println("Check file "+ files.getString("PATH"));
                     if(controller.getCoDB().getDateForFile(files.getString("PATH")) == 0) {
                         System.out.println("Add new file");
-                        controller.getCoDB().update("INSERT INTO FILES(PATH,DATE,SUPPRESSED, NEEDDOWNLOAD, MODIFIEDAT) VALUES ('" + files.getString("PATH") + "'," + files.getString("DATE") + ","+(files.getInt("SUPPRESSED")>0?"0":"1")+","+(files.getInt("SUPPRESSED")>0?"0":"1")+"," + files.getLong("MODIFIEDAT") + ")");
+                        controller.getCoDB().update("INSERT INTO FILES(PATH,DATE,SUPPRESSED, NEEDDOWNLOAD, MODIFIEDAT) VALUES ('" + files.getString("PATH") + "'," + files.getString("DATE") + ","+(files.getInt("SUPPRESSED")>0?"1":"0")+","+(files.getInt("SUPPRESSED")>0?"0":"1")+"," + files.getLong("MODIFIEDAT") + ")");
                 }
                     else{
                         if(controller.getCoDB().getDateForFile(files.getString("PATH")) < files.getLong("DATE")){
@@ -211,9 +220,10 @@ public class CoDownloader implements Runnable{
         long startTime = System.currentTimeMillis();
         while(!allSocketsHaveFileInfo(path)){
             long currentTime = System.currentTimeMillis();
-            if(currentTime-startTime>20000){
+            if(currentTime-startTime>30000){
                 break;
             }
+            Thread.sleep(500);
         }
         for(int i=0;i<socketsToUse.size();i++){
             if(socketsToUse.get(i).getFileInfo()==null){
@@ -222,6 +232,7 @@ public class CoDownloader implements Runnable{
             }
         }
         if(socketsToUse.size()==0){
+            downSignal.addRequest(path);
             return;
         }
         long mostRecentDate=0;
@@ -240,6 +251,7 @@ public class CoDownloader implements Runnable{
         }
         if(socketsToUse.size()==0){
             System.out.println("No more sockets");
+            downSignal.addRequest(path);
             return;
         }
         blockState=new int[socketsToUse.get(0).getBlockState().length];

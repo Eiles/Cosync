@@ -51,11 +51,10 @@ public class Cosocket implements Runnable {
                 }
                 if(dis.available()>0){
                     toRead=dis.readInt();
-                    System.out.println("Reading");
-                    System.out.println(toRead);
                     if(toRead>0){
                         request=new byte[toRead];
                     }else{
+                        i=0;
                         continue;
                     }
                     while(i<toRead){
