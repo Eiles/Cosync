@@ -42,7 +42,7 @@ public class CoDownloader implements Runnable{
         try {
             System.out.println("Start CoDownloader");
             dbSockets = new HashMap<>();
-
+            init:
             initSockets();
             while (true){
                 if(downSignal.requestList.size()!=0){
@@ -50,8 +50,7 @@ public class CoDownloader implements Runnable{
                     String request=downSignal.getRequest();
                     getSocketsForFile(request);
                     if(socketsToUse.size()<1){
-                        System.out.println("No sockets for given File");
-                       break;
+                        initSockets();
                     }
                     getFile(request);
                 }
@@ -97,18 +96,20 @@ public class CoDownloader implements Runnable{
     }
 
     public void getLastDB(CoSignal signal, Cosystem system) throws Exception {
-        System.out.println("Get Last DB");
+        if(controller.getCoDB().getLastUpdate(system.getKey())==0) {
+            System.out.println("Get Last DB");
 
-        signal.addRequest("getDB:"+system.getKey());
-        long startTime = System.currentTimeMillis();
-        while(!hasDB(signal)){
-            if(System.currentTimeMillis()-startTime>5000){
-                break;
+            signal.addRequest("getDB:" + system.getKey());
+            long startTime = System.currentTimeMillis();
+            while (!hasDB(signal)) {
+                if (System.currentTimeMillis() - startTime > 5000) {
+                    break;
+                }
             }
-        }
-        if(hasDB(signal)){
-            System.out.println("DB downloaded");
-            dbSockets.put(system.getKey(), new CoDB(system.getKey()));
+            if (hasDB(signal)) {
+                System.out.println("DB downloaded");
+                dbSockets.put(system.getKey(), new CoDB(system.getKey()));
+            }
         }
 
     }
@@ -130,26 +131,28 @@ public class CoDownloader implements Runnable{
                     System.out.println("Check file "+ files.getString("PATH"));
                     if(controller.getCoDB().getDateForFile(files.getString("PATH")) == 0) {
                         System.out.println("Add new file");
-                        controller.getCoDB().update("INSERT INTO FILES(PATH,DATE,SUPPRESSED, NEEDDOWNLOAD, MODIFIEDAT) VALUES ('" + files.getString("PATH") + "'," + files.getString("DATE") + ","+(files.getInt("SUPPRESSED")>0?"0":"1")+","+(files.getInt("SUPPRESSED")>0?"0":"1")+"," + files.getString("MODIFIEDAT") + ")");
+                        controller.getCoDB().update("INSERT INTO FILES(PATH,DATE,SUPPRESSED, NEEDDOWNLOAD, MODIFIEDAT) VALUES ('" + files.getString("PATH") + "'," + files.getString("DATE") + ","+(files.getInt("SUPPRESSED")>0?"0":"1")+","+(files.getInt("SUPPRESSED")>0?"0":"1")+"," + files.getLong("MODIFIEDAT") + ")");
                 }
                     else{
                         if(controller.getCoDB().getDateForFile(files.getString("PATH")) < files.getLong("DATE")){
                                 System.out.println("Update file");
-                                controller.getCoDB().update("UPDATE FILES SET NEEDDOWNLOAD="+(files.getInt("SUPPRESSED")>0?"0":"1")+", SUPPRESSED = "+files.getInt("SUPPRESSED")+", MODIFIEDAT =+" + files.getLong("MODIFIEDAT")+" WHERE PATH="+files.getString("PATH"));
+                                controller.getCoDB().update("UPDATE FILES SET NEEDDOWNLOAD="+(files.getInt("SUPPRESSED")>0?"0":"1")+", SUPPRESSED = "+files.getInt("SUPPRESSED")+", MODIFIEDAT =+" + files.getLong("MODIFIEDAT")+" WHERE PATH='"+files.getString("PATH")+"'");
                         }
                     }
                 }
+                files = controller.getCoDB().getFiles();
+                while(files.next()) {
+                    if(files.getInt("NEEDDOWNLOAD") == 1) {
+                        this.downSignal.addRequest(files.getString("PATH"));
+                    }
+                }
+                controller.getCoDB().update("INSERT INTO LASTDB (SYSTEM, UPDATEDATE) VALUES ('"+system+"',"+System.currentTimeMillis()+")");
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        files = controller.getCoDB().getFiles();
-        while(files.next()) {
-            if(files.getInt("NEEDDOWNLOAD") == 1) {
-                this.downSignal.addRequest(files.getString("PATH"));
-            }
-        }
     }
 
     public void getFile(String path) throws InterruptedException, SQLException {

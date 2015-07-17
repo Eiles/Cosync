@@ -290,4 +290,24 @@ public class CoDB {
             return res;
         }
 
+        public long getLastUpdate(String key)  {
+            Statement stmt=null;
+            long ret=0;
+            try {
+                stmt = c.createStatement();
+                ResultSet res = stmt.executeQuery("SELECT UPDATEDATE FROM LASTDB WHERE SYSTEM='" + key  + "' LIMIT 1");
+                if (res.next())
+                    ret = res.getLong("UPDATEDATE");
+                else{
+                    ret= 0;
+                }
+                c.commit();
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+                return 0;
+            }
+            return ret;
+        }
+
 }
