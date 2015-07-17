@@ -17,6 +17,16 @@ public class CoSignal {
     protected boolean dbDownload=false;
     protected CoDB coDB;
 
+    public CoSignal(CoDB coDB) {
+        this.coDB = coDB;
+        if(this.coDB == null) {
+            System.out.println("your CoDB is null");
+        }
+    }
+
+    public CoSignal() {
+    }
+
     public synchronized CoDB getCoDB() {
         return coDB;
     }

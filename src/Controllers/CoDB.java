@@ -152,7 +152,7 @@ public class CoDB {
         Statement stmt=null;
         String ret=null;
         stmt = c.createStatement();
-        ResultSet res = stmt.executeQuery("SELECT * FROM FILES WHEN MODIFIEDAT > "+date);
+        ResultSet res = stmt.executeQuery("SELECT * FROM FILES WHERE MODIFIEDAT > "+date);
         c.commit();
         //System.out.println("Query executed successfully");
         return res;

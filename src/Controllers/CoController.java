@@ -76,9 +76,7 @@ public class CoController extends Thread {
     public void run() {
         try {
             proceed();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

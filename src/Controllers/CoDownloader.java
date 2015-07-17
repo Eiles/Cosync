@@ -8,12 +8,16 @@ import Models.Couser;
 import com.sun.org.apache.xpath.internal.SourceTree;
 
 import javax.swing.*;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.net.*;
 import java.nio.file.Path;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,11 +72,10 @@ public class CoDownloader implements Runnable{
         CoSignal signal;
 
         for(int i=0;i<controller.getUser().getCosystems().size();i++){
-            signal=new CoSignal();
+            signal=new CoSignal(controller.getCoDB());
             system =controller.getUser().getCosystems().get(i);
             address=InetAddress.getByName(system.getIp());
             signal.setSystemKey(system.getKey());
-            signal.setCoDB(controller.getCoDB());
 
             try {
                 Socket s=new Socket();
@@ -127,10 +130,9 @@ public class CoDownloader implements Runnable{
                             }
                         }
                         if(ok){
-                            CoSignal signalAdd=new CoSignal();;
+                            CoSignal signalAdd=new CoSignal(controller.getCoDB());
                             address=InetAddress.getByName(system.getIp());
                             signalAdd.setSystemKey(system.getKey());
-                            signalAdd.setCoDB(controller.getCoDB());
                             Socket s=new Socket();
                             s.connect(new InetSocketAddress(address, 7777), 4000);
                             Runnable client = new Cosocket(s, 0, signalAdd);
@@ -162,7 +164,7 @@ public class CoDownloader implements Runnable{
 
             signal.addRequest("getDB:" + system.getKey());
             long startTime = System.currentTimeMillis();
-            while (!hasDB(signal)) {
+                while (!hasDB(signal)) {
                 if (System.currentTimeMillis() - startTime > 5000) {
                     break;
                 }
@@ -173,8 +175,36 @@ public class CoDownloader implements Runnable{
             }
         }
         else {
+            long startTime = System.currentTimeMillis();
             System.out.println("Get Modifs");
             signal.addRequest("getModif:"+controller.getCoDB().getLastUpdate(system.getKey()));
+
+            while (!hasDB(signal)) {
+                if (System.currentTimeMillis() - startTime > 5000) {
+                    break;
+                }
+            }
+            if (hasDB(signal)) {
+                System.out.println("DB downloaded");
+                String line;
+
+                FileReader fr = new FileReader(signal.getSystemKey()+"_modif");
+                BufferedReader br = new BufferedReader(fr);
+                while((line = br.readLine()) != null) {
+                    String[] args=line.split(":");
+                    if(args.length>1){
+                        args = Arrays.copyOfRange(args, 1, args.length);
+                    }
+
+                    // Vérif: si exist: mettre à jour si plus récent
+                    if(controller.getCoDB().getDateForFile(args[0]) == 0){
+                        //controller.getCoDB().update("INSERT INTO FILES(PATH,DATE,SUPPRESSED,MODIFIEDAT) VALUES ('" + path + "'," + datesql + ",0," + System.currentTimeMillis() + ");
+                    }
+                    //else if(controller.getCoDB().getDateForFile(args[0]) )
+
+                    // Sinon: insert, copie données et mettre needdownload
+                }
+            }
         }
 
     }
