@@ -1,5 +1,7 @@
 package Controllers;
 
+import com.sun.org.apache.xpath.internal.SourceTree;
+
 import java.nio.file.*;
 import static java.nio.file.StandardWatchEventKinds.*;
 import static java.nio.file.LinkOption.*;
@@ -19,16 +21,18 @@ public class CoWatcher extends Thread{
     private CoDB db;
     private boolean active=false;
     private CoController controller;
+    private CoVersionized versionized;
 
     /**
      * Constructeur
      */
-    CoWatcher(Path dir, boolean recursive,CoController controller) throws IOException {
+    CoWatcher(Path dir, boolean recursive,CoController controller, CoVersionized versionized) throws IOException {
         this.watcher = FileSystems.getDefault().newWatchService();
         this.keys = new HashMap();
         this.recursive = recursive;
         this.controller = controller;
         this.db = controller.getCoDB();
+        this.versionized = versionized;
 
         if (recursive) {
             System.out.format("Scanning %s ...\n", dir);
@@ -104,7 +108,6 @@ public class CoWatcher extends Thread{
             for (WatchEvent event: key.pollEvents()) {
 
                 WatchEvent.Kind kind = event.kind();
-
                 
                 if (kind == OVERFLOW) {
                     continue;
@@ -113,7 +116,14 @@ public class CoWatcher extends Thread{
                 // On recupère les infos d'evenements
                 WatchEvent ev = event;
                 Path name = (Path) ev.context();
+
+
                 Path child = dir.resolve(name);
+                //TODO: si dans versionizeddList, ne rien faire (continue)
+                if(versionized.isFileInVersionized(child.getFileName().toString())) {
+                    System.out.println("File in VersionizedFiles list");
+                    continue;
+                }
 
                 // Si suppression
                 if(kind==ENTRY_DELETE){

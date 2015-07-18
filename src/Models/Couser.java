@@ -57,6 +57,7 @@ public class Couser {
     public void retrieveCosystems()
             throws Exception {
         String url = "http://192.168.1.96/api/systems.php";
+        String url = "http://127.0.0.1/Cosync/systems.php";
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.setRequestMethod("POST");
@@ -97,16 +98,17 @@ public class Couser {
         }
     }
 
-    public boolean exist()
+    public boolean exist(String system)
             throws Exception {
-        String url = "http://192.168.1.96/api/user.php";
+        String url = "http://127.0.0.1/Cosync/user.php";
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.setRequestMethod("POST");
         con.setRequestProperty("User-Agent", "Mozilla/5.0");
         con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
-        String urlParameters = "action=connection&username=" + this.getName() + "&password=" + this.getPassword();
+        System.out.println("system => "+system);
+        String urlParameters = "action=connection&username=" + this.getName() + "&password=" + this.getPassword()+"&system="+system;
 
         con.setDoOutput(true);
         DataOutputStream wr = new DataOutputStream(con.getOutputStream());

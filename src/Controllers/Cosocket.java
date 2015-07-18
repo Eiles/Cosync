@@ -148,23 +148,21 @@ public class Cosocket implements Runnable {
         ResultSet results;
 
         try {
-            System.out.printf("1");
             CoDB db=new CoDB("cosync");
             if(db==null)
                 System.out.println("DB is null");
             results = db.getModifiedFiles(modifDate);
 
-            System.out.println("2");
             DataOutputStream dos = new DataOutputStream(connection.getOutputStream());
             BufferedOutputStream bos = new BufferedOutputStream(dos);
-
-            System.out.println("3");
 
             StringBuffer sb = new StringBuffer();
 
             while(results.next()) {
                 sb.append(results.getString("PATH")+":"+results.getInt("SUPPRESSED")+":"+results.getLong("MODIFIEDAT")+"\n");
             }
+
+            System.out.println("sb =>"+sb.toString());
 
             byte[] b = sb.toString().getBytes("UTF-8");
             System.out.println("blength => "+b.length);

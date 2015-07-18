@@ -7,6 +7,7 @@ import Models.Couser;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.WatchEvent;
@@ -32,6 +33,7 @@ public class CoController extends Thread {
 
     private String actualView;
     private CoDownSignal downSignal;
+    private CoVersionized versionized;
     private CoDownloader downloader;
     private Thread downloadThread;
     private CoDownloadMenu download;
@@ -65,9 +67,10 @@ public class CoController extends Thread {
 
         coDB = new CoDB();
         coserver = new Coserver();
-        watcher = new CoWatcher(dir, true, this);
+        watcher = new CoWatcher(dir, true, this, versionized);
         downSignal = new CoDownSignal();
-        downloader = new CoDownloader(downSignal, this);
+        downloader = new CoDownloader(downSignal, this, versionized);
+        versionized = new CoVersionized();
 
         events = new Stack<>();
         views  = new HashMap<>();
@@ -125,7 +128,10 @@ public class CoController extends Thread {
         }
 
         if(views.get("main") != null) {
+
             events.push(new CoEvent(type, child.getFileName().toString()));
+            if(events.size() > 50)
+                events.remove(events.lastElement());
             ((CoMainMenu)views.get("main")).updateListEvents(events);
         }
     }
@@ -169,11 +175,10 @@ public class CoController extends Thread {
     public void logIn(String name, String password) throws Exception {
 
         try {
-            //TODO: Vérification et récupération des données du User
             Couser user = new Couser(name, password);
             this.user = user;
 
-            if (user.exist()) {
+            if (user.exist(InetAddress.getLocalHost().getHostName())) {
                 user.retrieveCosystems();
 
                 /*if(downloadThread.isAlive ()) {

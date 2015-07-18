@@ -29,15 +29,17 @@ public class CoDownloader implements Runnable{
     ArrayList<CoSignal> socketArray=new ArrayList<>();
     ArrayList<CoSignal> socketsToUse=new ArrayList<>();
     private Map<String, CoDB> dbSockets;
+    private CoVersionized versionized;
 
     long downloadStart;
     int blockState[]=null;
     CoDownSignal downSignal;
     private CoController controller;
 
-    public CoDownloader(CoDownSignal signal, CoController controller) {
+    public CoDownloader(CoDownSignal signal, CoController controller, CoVersionized versionized) {
         this.controller = controller;
-        this.downSignal=signal;
+        this.downSignal = signal;
+        this.versionized = versionized;
     }
 
     public void run() {
@@ -192,24 +194,41 @@ public class CoDownloader implements Runnable{
                 BufferedReader br = new BufferedReader(fr);
                 while((line = br.readLine()) != null) {
                     String[] args=line.split(":");
-                    if(args.length>1){
-                        args = Arrays.copyOfRange(args, 1, args.length);
+                    if(args.length>0){
+                        args = Arrays.copyOfRange(args, 0, args.length);
+                    }
+                    System.out.println("length args =>"+args.length);
+
+                    for(int i = 0; i< args.length; i++) {
+                        System.out.println("args =>"+args[i]);
                     }
 
                     // Vérif: si exist: mettre à jour si plus récent
-                    if(controller.getCoDB().getDateForFile(args[0]) == 0){
-                        //controller.getCoDB().update("INSERT INTO FILES(PATH,DATE,SUPPRESSED,MODIFIEDAT) VALUES ('" + path + "'," + datesql + ",0," + System.currentTimeMillis() + ");
-                    }
-                    //else if(controller.getCoDB().getDateForFile(args[0]) )
-
                     // Sinon: insert, copie données et mettre needdownload
+
+                    //Si le fichier est nouveau
+                    if(controller.getCoDB().getDateForFile(args[0]) == 0){
+                        controller.getCoDB().update("INSERT INTO FILES(PATH,DATE,NEEDDOWNLOAD,SUPPRESSED,MODIFIEDAT) VALUES ('" + args[0] + "'," + System.currentTimeMillis() + "1,0," +"'"+ args[2]+"'");
+                    }
+
+                    // S'il le fichier est plus récent
+                    else if(controller.getCoDB().getDateForFile(args[0]) < Long.parseLong(args[2])) {
+                        controller.getCoDB().update("UPDATE FILES SET NEEDDOWNLOAD = 1, MODIFIEDAT = "+Long.parseLong(args[2])+" WHERE PATH ='"+args[0]+"'");
+                    }
+
+                    // Si le fichier est à supprimer
+                    else if(Integer.parseInt(args[1]) == 1) {
+                        controller.getCoDB().update("UPDATE FILES SET SUPPRESSED = 1, MODIFIEDAT = "+args[2]+" WHERE PATH ="+args[0]+"'");
+                    }
                 }
+
+                br.close();
+                fr.close();
             }
         }
 
     }
 
-    //TODO: Finir fonction
     public void getNewFiles() throws SQLException {
         System.out.println("Get New Files");
         CoDB compareDB=null;
