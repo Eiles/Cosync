@@ -192,15 +192,12 @@ public class CoDownloader implements Runnable{
 
                 FileReader fr = new FileReader(signal.getSystemKey()+"_modif");
                 BufferedReader br = new BufferedReader(fr);
+
+                StringBuilder request = new StringBuilder();
                 while((line = br.readLine()) != null) {
                     String[] args=line.split(":");
                     if(args.length>0){
                         args = Arrays.copyOfRange(args, 0, args.length);
-                    }
-                    System.out.println("length args =>"+args.length);
-
-                    for(int i = 0; i< args.length; i++) {
-                        System.out.println("args =>"+args[i]);
                     }
 
                     // Vérif: si exist: mettre à jour si plus récent
@@ -208,19 +205,21 @@ public class CoDownloader implements Runnable{
 
                     //Si le fichier est nouveau
                     if(controller.getCoDB().getDateForFile(args[0]) == 0){
-                        controller.getCoDB().update("INSERT INTO FILES(PATH,DATE,NEEDDOWNLOAD,SUPPRESSED,MODIFIEDAT) VALUES ('" + args[0] + "'," + System.currentTimeMillis() + "1,0," +"'"+ args[2]+"'");
+                        request.append("INSERT INTO FILES(PATH,DATE,NEEDDOWNLOAD,SUPPRESSED,MODIFIEDAT) VALUES ('" + args[0] + "'," + System.currentTimeMillis() + "1,0," + "'" + args[2] + "';");
                     }
 
                     // S'il le fichier est plus récent
                     else if(controller.getCoDB().getDateForFile(args[0]) < Long.parseLong(args[2])) {
-                        controller.getCoDB().update("UPDATE FILES SET NEEDDOWNLOAD = 1, MODIFIEDAT = "+Long.parseLong(args[2])+" WHERE PATH ='"+args[0]+"'");
+                        request.append("UPDATE FILES SET NEEDDOWNLOAD = 1, MODIFIEDAT = " + args[2] + " WHERE PATH ='" + args[0] + "';");
                     }
 
                     // Si le fichier est à supprimer
                     else if(Integer.parseInt(args[1]) == 1) {
-                        controller.getCoDB().update("UPDATE FILES SET SUPPRESSED = 1, MODIFIEDAT = "+args[2]+" WHERE PATH ="+args[0]+"'");
+                        request.append("UPDATE FILES SET SUPPRESSED = 1, MODIFIEDAT = "+args[2]+" WHERE PATH ="+args[0]+"';");
                     }
                 }
+
+                controller.getCoDB().update(request.toString());
 
                 br.close();
                 fr.close();
