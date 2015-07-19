@@ -1,7 +1,17 @@
 ﻿<?php
+if(!isset($_POST['username']) || !isset($_POST['password']))
+	return false;
+if(isset($_POST['action'])){
+	switch($_POST['action']){
+		case "connection":
+			echo connection($_POST['username'],$_POST['password']);
+			break;
+		default:
+			break;
+	}
+}
 
 function connection($username,$password){
-	if($username == "" || $password == "") return false;
 	$dbh = new PDO('mysql:host=127.0.0.1;dbname=cosync', 'root', 'toor');
 	
 	$params = array(":u" => $username, ":p" => $password);
@@ -10,9 +20,8 @@ function connection($username,$password){
 			
 	if($statement && $statement->execute($params)){
 		$row = $statement->fetchALL();
-		var_dump($row);
 		
-		if($row[0][2]){
+		if(isset($row[0][2])){
 			$_SESSION["username"] = $row[0][0];
 			$_SESSION["password"] = $row[0][1];
 			$_SESSION["id"] = $row[0][2];
@@ -21,7 +30,8 @@ function connection($username,$password){
 		}
 		
 	}
-	return false;
+	
+	return 0;	 
 }
 
 function creationUser($username, $password){
@@ -33,7 +43,7 @@ function creationUser($username, $password){
 	if($statement && $statement->execute($params)){
 		$row = $statement->fetchALL();
 		if($row)
-			echo "Ce nom d'utilisateur est déjà utilisé. Merci d'en choisir un nouveau.";
+			echo "Ce nom d'utulisateur est déjà utilisé. Merc d'en choisir un nouveau.";
 		else{
 			$params = array(":u" => $username, ":p" => $password);
 			$statement = $dbh->prepare("INSERT INTO `user` (`name`, `password`) VALUES (:u, :p)");
@@ -43,5 +53,7 @@ function creationUser($username, $password){
 			else echo "Erreur de requête";
 		}
 	}
+	
 }
+
 ?>

@@ -14,8 +14,8 @@
 	<h1>Bienvenue et merci de créér un compte chez nous.</h1>
 	<br><br>
 	<form method="post" action="creation.php">
-		<h3>Renseignez votre adresse mail</h3> <input type="text" name="username"><br>
-		<h3>Renseignez votre mot de passe</h3> <input type="password" name="password"><br><br>
+		<h3>Renseigner votre adresse mail</h3> <input type="text" name="username"><br>
+		<h3>Renseigner votre mot de passe</h3> <input type="password" name="password"><br><br>
 		<input class="btn btn-primary" type="submit" value="Créer votre compte">
 	</form>
 <?php
