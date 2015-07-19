@@ -119,7 +119,6 @@ public class CoWatcher extends Thread{
 
 
                 Path child = dir.resolve(name);
-                //TODO: si dans versionizeddList, ne rien faire (continue)
                 if(versionized.isFileInVersionized(child.getFileName().toString())) {
                     System.out.println("File in VersionizedFiles list");
                     continue;
