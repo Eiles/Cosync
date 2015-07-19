@@ -11,7 +11,7 @@
 	deconnection($path."coSync/account.php");
 	
 	//Display of the username of the user and when did he connect
-	echo "<h2>Hello ".$_SESSION["username"]." tu t'es connecté à ".date('D, d M Y H:i:s',$_SESSION["arriver"]);
+	echo "<h2>Hello ".$_SESSION["username"]." tu t'es connecté à ".date('D, d M Y H:i:s',$_SESSION["arriver"])." avec cette adresse IP : ".$_SERVER['REMOTE_ADDR'];
 	echo "</h2><br><br>";
 ?>
 

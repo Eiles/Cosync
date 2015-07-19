@@ -22,7 +22,7 @@
 			$username=$_POST["username"];
 			$password=$_POST["password"];
 			
-			if(connection($username,$password))
+			if(connection($username,$password, "nokey"))
 				header("Location: http://localhost/coSync/account.php");
 			else echo "Mauvais username ou mauvais mot de passe";
 		}	
