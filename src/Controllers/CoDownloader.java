@@ -46,7 +46,7 @@ public class CoDownloader implements Runnable{
         try {
             System.out.println("Start CoDownloader");
             dbSockets = new HashMap<>();
-            init:
+
             initSockets();
             while (true){
                 if(downSignal.requestList.size()!=0){
@@ -141,10 +141,10 @@ public class CoDownloader implements Runnable{
                             Thread threadClient = new Thread(client);
                             threadClient.start();
                             socketArray.add(signalAdd);
-
+                            getLastDB(signalAdd,system);
                         }
                     }
-
+                    getNewFiles();
                     Thread.sleep(500);
                 }
                 catch (SocketException e) {
@@ -199,30 +199,35 @@ public class CoDownloader implements Runnable{
                     if(args.length>0){
                         args = Arrays.copyOfRange(args, 0, args.length);
                     }
+                    System.out.println("length args =>"+args.length);
+
+                    for(int i = 0; i< args.length; i++) {
+                        System.out.println("args =>"+args[i]);
+                    }
 
                     // Vérif: si exist: mettre à jour si plus récent
                     // Sinon: insert, copie données et mettre needdownload
 
                     //Si le fichier est nouveau
                     if(controller.getCoDB().getDateForFile(args[0]) == 0){
-                        request.append("INSERT INTO FILES(PATH,DATE,NEEDDOWNLOAD,SUPPRESSED,MODIFIEDAT) VALUES ('" + args[0] + "'," + System.currentTimeMillis() + "1,0," + "'" + args[2] + "';");
+                        controller.getCoDB().update("INSERT INTO FILES(PATH,DATE,NEEDDOWNLOAD,SUPPRESSED,MODIFIEDAT) VALUES ('" + args[0] + "'," + System.currentTimeMillis() + ",1,0," +""+Long.parseLong(args[2])+")");
                     }
 
                     // S'il le fichier est plus récent
                     else if(controller.getCoDB().getDateForFile(args[0]) < Long.parseLong(args[2])) {
-                        request.append("UPDATE FILES SET NEEDDOWNLOAD = 1, MODIFIEDAT = " + args[2] + " WHERE PATH ='" + args[0] + "';");
+                        controller.getCoDB().update("UPDATE FILES SET NEEDDOWNLOAD = 1, MODIFIEDAT = "+Long.parseLong(args[2])+" WHERE PATH ='"+args[0]+"'");
                     }
 
                     // Si le fichier est à supprimer
                     else if(Integer.parseInt(args[1]) == 1) {
-                        request.append("UPDATE FILES SET SUPPRESSED = 1, MODIFIEDAT = "+args[2]+" WHERE PATH ="+args[0]+"';");
+                        controller.getCoDB().update("UPDATE FILES SET SUPPRESSED = 1, MODIFIEDAT = "+args[2]+" WHERE PATH ="+args[0]+"'");
                     }
                 }
 
-                controller.getCoDB().update(request.toString());
-
                 br.close();
                 fr.close();
+                controller.getCoDB().update("UPDATE LASTDB SET UPDATEDATE="+System.currentTimeMillis()+" WHERE SYSTEM ='"+system.getKey()+"'");
+
             }
         }
 
@@ -253,12 +258,6 @@ public class CoDownloader implements Runnable{
                         }
                     }
                 }
-                files = controller.getCoDB().getFiles();
-                while(files.next()) {
-                    if(files.getInt("NEEDDOWNLOAD") == 1) {
-                        this.downSignal.addRequest(files.getString("PATH"));
-                    }
-                }
                 controller.getCoDB().update("INSERT INTO LASTDB (SYSTEM, UPDATEDATE) VALUES ('"+system+"',"+System.currentTimeMillis()+")");
 
             } catch (Exception e) {
@@ -266,6 +265,12 @@ public class CoDownloader implements Runnable{
             }
         }
 
+        files = controller.getCoDB().getFiles();
+        while(files.next()) {
+            if(files.getInt("NEEDDOWNLOAD") == 1) {
+                this.downSignal.addRequest(files.getString("PATH"));
+            }
+        }
     }
 
     public void getFile(String path) throws InterruptedException, SQLException {
