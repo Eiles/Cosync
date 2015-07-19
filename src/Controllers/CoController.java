@@ -67,10 +67,11 @@ public class CoController extends Thread {
 
         coDB = new CoDB();
         coserver = new Coserver();
+        versionized = new CoVersionized();
         watcher = new CoWatcher(dir, true, this, versionized);
         downSignal = new CoDownSignal();
         downloader = new CoDownloader(downSignal, this, versionized);
-        versionized = new CoVersionized();
+
 
         events = new Stack<>();
         views  = new HashMap<>();
