@@ -8,11 +8,10 @@
 	
 	displayHTMLHeader("Page utilisateur");
 	startSession();
-	echo "<div class=\"container\">";
 	deconnection($path."coSync/account.php","Se deconnecter");
 	
 	//Display of the username of the user and when did he connect
-	echo "<h2>Hello ".$_SESSION["username"]." tu t'es connecté le ".date('d m Y H:i:s',$_SESSION["arriver"])." avec cette adresse IP : ".$_SERVER['REMOTE_ADDR'];
+	echo "<h2>Bienvenue <strong>".$_SESSION["username"]."</strong> vous êtes identifié avec l'adresse ".$_SERVER['REMOTE_ADDR'].", le ".date('d/m/Y',$_SESSION["arriver"])." à ".date('H:i:s',$_SESSION["arriver"]);
 	echo "</h2><br><br>";
 ?>
 
@@ -33,7 +32,7 @@
 			
 			echo "<td class=\"element\"># ".$i."</td><td class=\"element\">".$systems[$i]->last_ip."</td><td class=\"button\" align=\"center\"><div style=\"width:100px\">";
 			
-			//If the system is register, display a button to unregister the system for the client
+			//If the system is visible, display a button to set the system to unvisible
 			if($systems[$i]->is_register){
 				systems_button("Visible", $i);
 				if(isset($_POST["Visible".$i])){
@@ -44,7 +43,7 @@
 					header("Location:".$path."coSync/account.php");	
 				}
 			}else{
-				//Same here but if the system is not register
+				//If the system is unvisible display a button to set the system to visible
 				systems_button("Invisible", $i);
 				if(isset($_POST["Invisible".$i])){
 					updateSystemRegistration($systems[$i]->id, 1);

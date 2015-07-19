@@ -1,4 +1,5 @@
 <?php
+	//Function to deconnect user of the website after X min of inactivity
 	function startSession(){
 		session_start();
 		if(time()-$_SESSION["arriver"]>25*60){
@@ -7,7 +8,8 @@
 			header("Location: http://localhost/coSync/accueil.php");
 		}
 	}
-
+	
+	//Function to allways display the same HTML Header to every page
 	function displayHTMLHeader($title){
 		$str="<!DOCTYPE html>
 		<html lang=\"en\">
@@ -19,10 +21,12 @@
 				<link href=\"css/bootstrap.min.css\" rel=\"stylesheet\">
 				<link href=\"css/signin.css\" rel=\"stylesheet\">
 			</head>
-			<body>";
+			<body>
+			<div class=\"container\">";
 		echo $str;
 	}
-
+	
+	//Function create in order to quickly create an means to return at the main page. It take the path of where the button is create and also take the string which will be display inside the button.
 	function deconnection($wherefrom,$value){
 		echo "<form class=\"form-signin\"  method=\"post\" action=".$wherefrom.">
 			<button class=\"btn btn-lg btn-danger btn-block\" type=\"submit\" name=\"deconnection\">".$value."</button>
@@ -35,7 +39,8 @@
 			header("Location: http://localhost/coSync/accueil.php");
 		}
 	}
-
+	
+	//Function to create the button display in the account page in order to set the visibility of your system. Change the class and the string of the button.
 	function systems_button($value, $number){
 		echo 
 		"<form action=\"account.php\"  method=\"post\">
@@ -45,6 +50,7 @@
 		</form>";
 	}
 	
+	//Quick javascript pop-up function
 	function alert($message){
 		echo '<script type="text/javascript">window.alert("'.$message.'");</script>';
 	}
