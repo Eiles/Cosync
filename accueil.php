@@ -4,19 +4,25 @@
 	displayHTMLHeader("Accueil CoSync");
 	session_start();
 ?>
-	<h1>Bienvenue sur le site CoSync, le logiciel de peer to peer entre amis</h1>
-	<br>
-	<h2>Vous avez déjà un compte ?<br><br>Connectez vous :</h2>
-	<form method="post" action="accueil.php">
-		<strong>username</strong> <input type="text" name="username">
-		<strong>Mot de passe</strong> <input type="password" name="password">
-		<input class="btn btn-primary" type="submit" value="Connection">
-	</form>
-	<br><br>
-	<form method="post" action="creation.php">
+	<div class="container">
+		<h1>Bienvenue sur le site CoSync, le logiciel de peer to peer entre amis</h1>
+		<br>
+		<h2>Vous avez déjà un compte ?<br><br>Connectez vous :</h2>
+		<form class="form-signin" method="post" action="accueil.php">
+			
+			<label for="inputEmail" class="sr-only">Username</label>
+			<input name="username" type="text" id="inputEmail" class="form-control" placeholder="Nom d'utilisateur" required autofocus>
+			<label for="inputPassword" class="sr-only">Password</label>
+			<input name="password" type="password" id="inputPassword" class="form-control" placeholder="Mot de passer" required>
+			<button class="btn btn-lg btn-primary btn-block" type="submit">Connection</button>
+		</form>
+
+		<br><br>
 		<h2>Sinon créez-vous un compte !</h2>
-		<input class="btn btn-primary" type="submit" value="Créer un compte">
-	</form>
+		<form class="form-signin" method="post" action="creation.php">
+			<button class="btn btn-lg btn-primary btn-block" type="submit">Créer un compte</button>
+		</form>
+	</div>
 	<?php
 		if (isset($_POST["username"]) && isset($_POST["password"])){
 			$username=$_POST["username"];
@@ -24,7 +30,7 @@
 			
 			if(connection($username,$password, "nokey"))
 				header("Location: http://localhost/coSync/account.php");
-			else echo "Mauvais username ou mauvais mot de passe";
+			else alert("Mauvais username ou mauvais mot de passe");
 		}	
 	?>
 	</body>

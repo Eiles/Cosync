@@ -2,10 +2,8 @@
 	require_once 'tool.php';
 	require_once 'user.php';
 	displayHTMLHeader("Creation de compte");
-	//deconnection("http://localhost/coSync/creation.php");
-	echo "<form method=\"post\" action=\"http://localhost/coSync/creation.php\">
-			<input class=\"btn btn-danger\" type=\"submit\" name=\"deconnection\" value=\"Retour à l'accueil\">
-		</form>";
+	deconnection("http://localhost/coSync/creation.php","Retour à l'accueil");
+	echo "<div class=\"container\">";
 		
 		if(isset($_POST["deconnection"])){
 			header("Location: http://localhost/coSync/accueil.php");
@@ -13,10 +11,12 @@
 ?>
 	<h1>Bienvenue et merci de créér un compte chez nous.</h1>
 	<br><br>
-	<form method="post" action="creation.php">
-		<h3>Renseigner votre adresse mail</h3> <input type="text" name="username"><br>
-		<h3>Renseigner votre mot de passe</h3> <input type="password" name="password"><br><br>
-		<input class="btn btn-primary" type="submit" value="Créer votre compte">
+	<form class="form-signin" method="post" action="creation.php">
+		<label for="inputEmail" class="sr-only">Username</label>
+			<input name="username" type="text" id="inputEmail" class="form-control" placeholder="Votre nom d'utilisateur" required autofocus>
+			<label for="inputPassword" class="sr-only">Password</label>
+			<input name="password" type="password" id="inputPassword" class="form-control" placeholder="Votre mot de passe" required>
+			<button class="btn btn-lg btn-primary btn-block" type="submit">Créer votre compte</button>
 	</form>
 <?php
 	if (isset($_POST["username"]) && isset($_POST["password"])){
@@ -30,5 +30,6 @@
 		else creationUser($username, $password);
 	}
 ?>
+</div>
 </body>
 </html>

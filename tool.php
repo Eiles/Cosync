@@ -17,14 +17,15 @@
 				<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">
 				<title>$title</title>
 				<link href=\"css/bootstrap.min.css\" rel=\"stylesheet\">
+				<link href=\"css/signin.css\" rel=\"stylesheet\">
 			</head>
 			<body>";
 		echo $str;
 	}
 
-	function deconnection($wherefrom){
-		echo "<form method=\"post\" action=".$wherefrom.">
-			<input class=\"btn btn-danger\" type=\"submit\" name=\"deconnection\" value=\"Se deconnecter\">
+	function deconnection($wherefrom,$value){
+		echo "<form class=\"form-signin\"  method=\"post\" action=".$wherefrom.">
+			<button class=\"btn btn-lg btn-danger btn-block\" type=\"submit\" name=\"deconnection\">".$value."</button>
 		</form>";
 		
 		if(isset($_POST["deconnection"])){
@@ -38,9 +39,13 @@
 	function systems_button($value, $number){
 		echo 
 		"<form action=\"account.php\"  method=\"post\">
-			<input class=\"btn btn-block btn-".
+			<input class=\"btn btn-block btn-" .
 			(substr($value, 0, 1) == 'V' ? "info" : "warning")
 			."\" name=\"".$value.$number."\" type=\"submit\" value=\"".$value."\">
 		</form>";
+	}
+	
+	function alert($message){
+		echo '<script type="text/javascript">window.alert("'.$message.'");</script>';
 	}
 ?>
