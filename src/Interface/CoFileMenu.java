@@ -110,7 +110,10 @@ public class CoFileMenu extends CoInterface {
 
         filesTree.clearSelection();
 
-        versionsList = setVersions();
+        versionsList = new JList<String>();
+        versionsList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        versionsList.setLayoutOrientation(JList.VERTICAL);
+
         versionPanel = new JScrollPane(versionsList);
         versionPanel.setBorder(new LineBorder(Color.black.darkGray));
 
@@ -121,14 +124,11 @@ public class CoFileMenu extends CoInterface {
         add(center, BorderLayout.CENTER);
     }
 
-    private JList setVersions() {
+    private void setVersions() {
         if(selected != null) {
 
             List versions = controller.getOldVersionsOfFile(Paths.get(Config.root).relativize(selected.toPath()).toString());
-
-            versionsList = new JList<String>(new Vector<>(versions));
-            versionsList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-            versionsList.setLayoutOrientation(JList.VERTICAL);
+            versionsList.setListData(new Vector<String>(versions));
 
             versionsList.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent evt) {
@@ -145,17 +145,13 @@ public class CoFileMenu extends CoInterface {
                 }
             });
         }
-        else {
-            versionsList = null;
-        }
-
-        return versionsList;
     }
 
     private void updateVersions() {
-        versionsList = setVersions();
+
+        setVersions();
         versionsList.revalidate();
-        repaint();
+        versionsList.repaint();
     }
 
     private void setSouth() {
