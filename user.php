@@ -17,7 +17,7 @@
 	
 	//This function take the username, the password and the key of the system. If it is the website that did call this function it will ensure that the username and password is the same as them in the database and authorize the user to get access to the website. If it is the application that did call the function it will either update the last_ip of the system or create the current system in the database if it does not exist.
 	function connection($username,$password,$key){
-		
+		$password = md5($password);
 		//create an access to the database
 		$dbh = new PDO('mysql:host=127.0.0.1;dbname=cosync', 'root', 'toor');
 		
@@ -79,6 +79,7 @@
 	
 	//This function allow a new user to create an account in order to get access to the application.
 	function creationUser($username, $password){
+		$password = md5($password);
 		$dbh = new PDO('mysql:host=127.0.0.1;dbname=cosync', 'root', 'toor');
 		$params = array(":u" => $username);
 		

@@ -14,14 +14,17 @@
 		$str="<!DOCTYPE html>
 		<html lang=\"en\">
 			<head>
+				<link rel=\"icon\" type=\"image/png\" href=\"logo.png\" style=\"width:16px;height:16px;\"\>
 				<meta charset=\"utf-8\">
 				<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">
 				<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">
 				<title>$title</title>
 				<link href=\"css/bootstrap.min.css\" rel=\"stylesheet\">
 				<link href=\"css/signin.css\" rel=\"stylesheet\">
+				
 			</head>
 			<body>
+			<div align=\"center\"><img src=\"logo.png\" style=\"width:100px;height:100px;\"></div>
 			<div class=\"container\">";
 		echo $str;
 	}

@@ -4,7 +4,6 @@
 	displayHTMLHeader("Accueil CoSync");
 	session_start();
 ?>
-	<div class="container">
 		<h1>Bienvenue sur le site CoSync, le logiciel de peer to peer entre amis</h1>
 		<br>
 		<h2>Vous avez déjà un compte ?<br><br>Connectez vous :</h2>
@@ -14,7 +13,7 @@
 			<label for="inputEmail" class="sr-only">Username</label>
 			<input name="username" type="text" id="inputEmail" class="form-control" placeholder="Nom d'utilisateur" required autofocus>
 			<label for="inputPassword" class="sr-only">Password</label>
-			<input name="password" type="password" id="inputPassword" class="form-control" placeholder="Mot de passer" required>
+			<input name="password" type="password" id="inputPassword" class="form-control" placeholder="Mot de passe" required>
 			<button class="btn btn-lg btn-primary btn-block" type="submit">Connection</button>
 		</form>
 		<br>
