@@ -10,6 +10,7 @@ import java.io.*;
 import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.Collator;
 import java.util.*;
 
 public class Cosocket implements Runnable {
@@ -132,11 +133,18 @@ public class Cosocket implements Runnable {
                 sendBlock(args);
                 break;
             }
+
+            case "listDiff" :{
+                sendListDiff(args[0]);
+                break;
+            }
             case "close" : {
                     connection.close();
                     currentThread.interrupt();
                     break;
             }
+
+
             case "hasFileResponse" : {
                 hasFileResponse(args);
                 break;
@@ -419,6 +427,20 @@ public class Cosocket implements Runnable {
         dos.flush();
         System.out.println("Request sent : "+token);
         this.sharedSignal.setBusy(false);
+    }
+
+    public void sendListDiff(String path){
+        StringBuilder sb;
+        File diffDir=new File("diff");
+        File files[]=diffDir.listFiles();
+        List<String> diffList=new LinkedList<String>();
+        for (int i = 0; i <files.length ; i++) {
+            if(("diff/"+(files[i].getName().substring(0,files[i].getName().lastIndexOf('_')))).equals(path)){
+                diffList.add(files[i].getName().substring(files[i].getName().lastIndexOf('_')));
+            }
+        }
+        Collections.sort(diffList, Collator.getInstance().reversed());
+        System.out.println(diffList.toString());
     }
 
 

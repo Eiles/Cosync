@@ -123,6 +123,27 @@ public class Cofile implements Config,Serializable{
         }
     }
 
+    public void restoreFromDiff( String file,String diffpath,String destination) {
+        try {
+            List<String> diff=cofileToLines(diffpath);
+            Patch p=DiffUtils.parseUnifiedDiff(diff);
+            List<String> toRestore= cofileToLines(file);
+            List restored = DiffUtils.unpatch(toRestore, p);
+
+            FileWriter fw=new FileWriter(destination);
+            for(int i=0;i<restored.size();i++){
+                fw.write(restored.get(i)+"\n");
+            }
+            fw.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public long getModDate() {
         return modDate;
     }

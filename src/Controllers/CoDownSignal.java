@@ -17,7 +17,8 @@ public class CoDownSignal {
     }
 
     public synchronized void addRequest(String request) {
-        this.requestList.add(request);
+        if(!requestList.contains(request))
+            this.requestList.add(request);
     }
 
 

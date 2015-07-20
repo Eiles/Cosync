@@ -346,6 +346,7 @@ public class CoDownloader implements Runnable{
             try {
                 System.out.println("Saving patch !");
                 socketsToUse.get(0).getFileInfo().savePatch(Config.root+"/"+newPath,"tmp/"+newPath,"diff/"+newPath+"_"+new File(Config.root+"/"+newPath).lastModified()+"-"+socketsToUse.get(0).getFileInfo().getModDate());
+                //socketsToUse.get(0).getFileInfo().restoreFromDiff(Config.root+"/"+newPath,"diff/"+newPath+"_"+new File(Config.root+"/"+newPath).lastModified()+"-"+socketsToUse.get(0).getFileInfo().getModDate(),"/Users/elie/restored");
             } catch (Exception e) {
                 e.printStackTrace();
             }

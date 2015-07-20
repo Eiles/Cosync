@@ -12,9 +12,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.WatchEvent;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
+import java.text.Collator;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static java.nio.file.StandardWatchEventKinds.*;
 
@@ -74,7 +74,29 @@ public class CoController extends Thread {
 
 
         events = new Stack<>();
-        views  = new HashMap<>();
+        views = new HashMap<>();
+
+
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        File diffDir = new File("diff");
+//        File files[] = diffDir.listFiles();
+//        List<String> diffList = new LinkedList<String>();
+//        for (int i = 0; i < files.length; i++) {
+//            if (((files[i].getName().substring(0, files[i].getName().lastIndexOf('_')))).equals("bite")) {
+//                diffList.add(files[i].getName().substring(files[i].getName().lastIndexOf('_') + 1));
+//            }
+//        }
+//        Collections.sort(diffList, Collator.getInstance().reversed());
+//        System.out.println(getCoDB().getModifiedAtForFile("bite"));
+//        System.out.println(Long.parseLong(diffList.get(0).substring(diffList.get(0).lastIndexOf('-') + 1)));
+//        if (diffList.size() > 0)
+//            for (int i = 0; i < diffList.size(); i++) {
+//                long datelong = Long.parseLong(diffList.get(i).substring(0, diffList.get(i).lastIndexOf('-')));
+//                Date date = new Date();
+//                date.setTime(datelong);
+//                System.out.println("Can go back to : " + sdf.format(date));
+//            }
+//
     }
 
     public void run() {
@@ -215,7 +237,6 @@ public class CoController extends Thread {
             Thread threadServer = new Thread(coserver);
             threadServer.start();
 
-            long startTime = System.currentTimeMillis();
             String sql = "CREATE TABLE FILES " +
                     "(" +
                     " ID INTEGER PRIMARY KEY   AUTOINCREMENT,"+
@@ -244,9 +265,6 @@ public class CoController extends Thread {
             coDB.executeBatchLastDBInsert();
             coDB.executeBatchLastDBUpdate();
 
-            long endTime   = System.currentTimeMillis();
-            long totalTime = endTime - startTime;
-            System.out.println("totalTime => "+totalTime);
 
             watcher.start();
             watcher.checkFolder(Paths.get(Config.root), coDB);

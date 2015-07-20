@@ -170,7 +170,7 @@ public class CoWatcher extends Thread{
                                 String path = Paths.get(Config.root).relativize(child).toString();
                                 long datesql = new File(child.toUri()).lastModified();
                                 System.out.println("Modifié le " + datesql);
-                                db.update("UPDATE FILES SET DATE=" + datesql + ", MODIFIEDAT=" + System.currentTimeMillis() + " WHERE PATH='" + path + "'");
+                                db.update("UPDATE FILES SET DATE=" + datesql + ", MODIFIEDAT=" + datesql + " WHERE PATH='" + path + "'");
                             } catch (Exception se) {
                                 System.out.println(se);
                             }
@@ -193,7 +193,7 @@ public class CoWatcher extends Thread{
                                     String path = Paths.get(Config.root).relativize(child).toString();
                                     long datesql = new File(child.toUri()).lastModified();
                                     System.out.println("Créé le " + datesql);
-                                    db.update("INSERT INTO FILES(PATH,DATE,SUPPRESSED,MODIFIEDAT) VALUES ('" + path + "'," + datesql + ",0," + System.currentTimeMillis() + ")");
+                                    db.update("INSERT INTO FILES(PATH,DATE,SUPPRESSED,MODIFIEDAT) VALUES ('" + path + "'," + datesql + ",0," + datesql + ")");
                                 } catch (Exception se) {
                                     System.out.println(se);
                                 }
