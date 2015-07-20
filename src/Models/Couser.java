@@ -9,6 +9,7 @@ import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +65,7 @@ public class Couser {
         con.setRequestProperty("User-Agent", "Mozilla/5.0");
         con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
-        String urlParameters = "action=retrieve&username=" + this.getName() + "&password=" + this.getPassword();
+        String urlParameters = "action=retrieve&username=" + this.getName() + "&password=" + this.getPassword()+"&key="+ InetAddress.getLocalHost().getHostName();
 
         con.setDoOutput(true);
         DataOutputStream wr = new DataOutputStream(con.getOutputStream());
@@ -108,7 +109,7 @@ public class Couser {
         con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
         System.out.println("system => "+system);
-        String urlParameters = "action=connection&username=" + this.getName() + "&password=" + this.getPassword()+"&system="+system;
+        String urlParameters = "action=connection&username=" + this.getName() + "&password=" + this.getPassword()+"&key="+ InetAddress.getLocalHost().getHostName();
 
         con.setDoOutput(true);
         DataOutputStream wr = new DataOutputStream(con.getOutputStream());
@@ -128,7 +129,7 @@ public class Couser {
             }
         }
         in.close();
-
+        System.out.println(Integer.parseInt(response.toString()));
         return Integer.parseInt(response.toString()) == 1?true:false;
     }
 }

@@ -268,6 +268,7 @@ public class CoController extends Thread {
             }
         }
         Collections.sort(diffList, Collator.getInstance().reversed());
+        System.out.println(diffList.toString());
         try {
             System.out.println(getCoDB().getModifiedAtForFile(path));
         } catch (SQLException e) {
@@ -289,7 +290,7 @@ public class CoController extends Thread {
         Cofile fic= new Cofile(path,0,false);
         String thePath=path;
         for(int i=0;i<=index;i++){
-            fic.restoreFromDiff(Config.root+"/"+thePath,"diff/"+list.get(i),"tmp/revised");
+            fic.restoreFromDiff(Config.root+"/"+thePath,"diff/"+path+"_"+list.get(i),"tmp/revised");
             thePath="tmp/revised";
         }
         File output = new File("tmp/revised");

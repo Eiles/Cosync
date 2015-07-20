@@ -50,7 +50,7 @@ public class CoFileMenu extends CoInterface {
 
     private Label header;
     private File selected;
-
+    private List versions;
     public CoFileMenu(CoController coController) {
 
         super(coController);
@@ -119,6 +119,21 @@ public class CoFileMenu extends CoInterface {
         versionPanel = new JScrollPane(versionsList);
         versionPanel.setPreferredSize(new Dimension(130, this.getHeight()));
         versionPanel.setBorder(new LineBorder(Color.black.darkGray));
+        versionsList.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent evt) {
+                JList list = (JList) evt.getSource();
+                if (evt.getClickCount() == 2) {
+                    JFileChooser chooser = new JFileChooser();
+                    chooser.setDialogTitle("Choix de la destination du fichier");
+
+                    int returnVal = chooser.showSaveDialog(null);
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        controller.getRevision(Paths.get(Config.root).relativize(selected.toPath()).toString(), chooser.getSelectedFile().getAbsolutePath(), versions, list.locationToIndex(evt.getPoint()));
+                    }
+
+                }
+            }
+        });
 
         center.add(filesTree, BorderLayout.CENTER);
         center.add(versionPanel, BorderLayout.EAST);
@@ -128,10 +143,11 @@ public class CoFileMenu extends CoInterface {
 
     private void setVersions() {
         if (selected != null) {
+            System.out.println((Paths.get(Config.root).relativize(selected.toPath()).toString()));
             if (controller.getOldVersionsOfFile(Paths.get(Config.root).relativize(selected.toPath()).toString()) != null) {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-                List versions = controller.getOldVersionsOfFile(Paths.get(Config.root).relativize(selected.toPath()).toString());
+                versions = controller.getOldVersionsOfFile(Paths.get(Config.root).relativize(selected.toPath()).toString());
                 LinkedList<String> oldDate = new LinkedList<>();
 
                 String version;
@@ -145,20 +161,7 @@ public class CoFileMenu extends CoInterface {
 
                 versionsList.setListData(new Vector<String>(oldDate));
 
-                versionsList.addMouseListener(new MouseAdapter() {
-                    public void mouseClicked(MouseEvent evt) {
-                        JList list = (JList) evt.getSource();
-                        if (evt.getClickCount() == 2) {
-                            JFileChooser chooser = new JFileChooser();
-                            chooser.setDialogTitle("Choix de la destination du fichier");
 
-                            int returnVal = chooser.showSaveDialog(null);
-                            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                                controller.getRevision(Paths.get(Config.root).relativize(selected.toPath()).toString(), chooser.getSelectedFile().getAbsolutePath(), versions, list.locationToIndex(evt.getPoint()));
-                            }
-                        }
-                    }
-                });
             }
         }
     }
