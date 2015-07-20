@@ -105,17 +105,22 @@ public class Cofile implements Config,Serializable{
         return DiffUtils.diff(original, revised);
     }
 
-    public void savePatch(Patch patch, String path) {
+    public void savePatch(String oldfile, String newfile,String path) {
         try {
-            FileOutputStream fos = new FileOutputStream(path);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(patch);
+            List<String> str=DiffUtils.generateUnifiedDiff(oldfile, newfile, cofileToLines(oldfile), generatePatch(oldfile, newfile), 80);
+            FileWriter fw=new FileWriter(path);
+            for(int i=0;i<str.size();i++){
+                fw.write(str.get(i)+"\n");
+            }
+            fw.close();
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
     }
 
     public long getModDate() {

@@ -66,7 +66,7 @@ public class CoController extends Thread {
         Path dir = new File(Config.root).toPath();
 
         coDB = new CoDB();
-        coserver = new Coserver();
+        coserver = new Coserver(this);
         versionized = new CoVersionized();
         watcher = new CoWatcher(dir, true, this, versionized);
         downSignal = new CoDownSignal();
@@ -211,7 +211,7 @@ public class CoController extends Thread {
         try {
             System.out.println("Init Application");
 
-            coserver = new Coserver();
+            coserver = new Coserver(this);
             Thread threadServer = new Thread(coserver);
             threadServer.start();
 

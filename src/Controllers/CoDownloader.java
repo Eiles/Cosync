@@ -85,7 +85,7 @@ public class CoDownloader implements Runnable{
             try {
                 Socket s=new Socket();
                 s.connect(new InetSocketAddress(address,7777), 4000);
-                Runnable client = new Cosocket(s, 0, signal);
+                Runnable client = new Cosocket(s, 0, signal,controller);
                 Thread threadClient = new Thread(client);
                 threadClient.start();
                 socketArray.add(signal);
@@ -140,7 +140,7 @@ public class CoDownloader implements Runnable{
                             signalAdd.setSystemKey(system.getKey());
                             Socket s=new Socket();
                             s.connect(new InetSocketAddress(address, 7777), 4000);
-                            Runnable client = new Cosocket(s, 0, signalAdd);
+                            Runnable client = new Cosocket(s, 0, signalAdd,controller);
                             Thread threadClient = new Thread(client);
                             threadClient.start();
                             socketArray.add(signalAdd);
@@ -342,10 +342,10 @@ public class CoDownloader implements Runnable{
         }
         File afile=new File("tmp/"+socketsToUse.get(0).getFileInfo().getPath());
         String newPath=socketsToUse.get(0).getFileInfo().getPath();
-        if(new File(newPath).exists()){
+        if(new File(Config.root+"/"+newPath).exists()){
             try {
-                Patch patch=socketsToUse.get(0).getFileInfo().generatePatch(newPath,"tmp/"+newPath);
-                socketsToUse.get(0).getFileInfo().savePatch(patch,"diff/"+newPath+"_"+new File(newPath).lastModified()+"-"+socketsToUse.get(0).getFileInfo().getModDate());
+                System.out.println("Saving patch !");
+                socketsToUse.get(0).getFileInfo().savePatch(Config.root+"/"+newPath,"tmp/"+newPath,"diff/"+newPath+"_"+new File(Config.root+"/"+newPath).lastModified()+"-"+socketsToUse.get(0).getFileInfo().getModDate());
             } catch (Exception e) {
                 e.printStackTrace();
             }

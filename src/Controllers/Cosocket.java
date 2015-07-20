@@ -20,12 +20,14 @@ public class Cosocket implements Runnable {
     public CoSignal sharedSignal;
     private Cofile cofile;
     private Thread currentThread;
+    private CoController controller;
 
-    public Cosocket(Socket s, int i, CoSignal signal) {
+    public Cosocket(Socket s, int i, CoSignal signal,CoController controller) {
         this.connection = s;
         this.id = i;
         this.auth=false;
         this.sharedSignal=signal;
+        this.controller=controller;
     }
 
     public void run() {
@@ -148,9 +150,7 @@ public class Cosocket implements Runnable {
         ResultSet results;
 
         try {
-            CoDB db=new CoDB("cosync");
-            if(db==null)
-                System.out.println("DB is null");
+            CoDB db=controller.getCoDB();
             results = db.getModifiedFiles(modifDate);
 
             DataOutputStream dos = new DataOutputStream(connection.getOutputStream());

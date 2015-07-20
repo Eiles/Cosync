@@ -20,3 +20,6 @@ cosync.db
 *.db
 *.db
 cosync.db
+
+diff/*
+*.zip

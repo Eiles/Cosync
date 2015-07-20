@@ -11,16 +11,18 @@ public class Coserver
 
     private int port = 7777;
     private int count = 0;
+    private CoController controller;
 
-
-
+    Coserver(CoController c){
+        this.controller=c;
+    }
     public void run(){
         try{
             ServerSocket socket1 = new ServerSocket(port);
             System.out.println("MultipleSocketServer Initialized");
             while (true) {
                 Socket connection = socket1.accept();
-                Runnable runnable = new Cosocket(connection, ++count, new CoSignal());
+                Runnable runnable = new Cosocket(connection, ++count, new CoSignal(),controller);
                 Thread thread = new Thread(runnable);
                 thread.start();
             }
