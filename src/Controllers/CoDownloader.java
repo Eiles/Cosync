@@ -141,11 +141,12 @@ public class CoDownloader implements Runnable{
                             Thread threadClient = new Thread(client);
                             threadClient.start();
                             socketArray.add(signalAdd);
-
+                            getLastDB(signalAdd,system);
                         }
                     }
 
                     Thread.sleep(500);
+                    getNewFiles();
                 }
                 catch (SocketException e) {
                     controller.getUser().getCosystems().get(i).setOnline(false);
@@ -187,6 +188,7 @@ public class CoDownloader implements Runnable{
                 }
             }
             if (hasDB(signal)) {
+                long date=System.currentTimeMillis();
                 System.out.println("DB downloaded");
                 String line;
 
@@ -224,6 +226,7 @@ public class CoDownloader implements Runnable{
 
                 br.close();
                 fr.close();
+                controller.getCoDB().update("UPDATE LASTDB SET UPDATEDATE="+date+" WHERE SYSTEM = '"+system.getKey()+"'");
             }
         }
 
