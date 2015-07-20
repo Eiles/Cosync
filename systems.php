@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	//If the application try to perform any action, the server will ensure that the username and password have been well transmited
     if(!isset($_POST['username']) || !isset($_POST['password']))
         return false;

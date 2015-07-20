@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	//Function to deconnect user of the website after X min of inactivity
 	function startSession(){
 		session_start();

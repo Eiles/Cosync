@@ -30,6 +30,9 @@
 			
 			if($statement && $statement->execute($params))
 				$id = $statement->fetchColumn();
+			if($id != null)
+				echo 1;
+			else echo 0;
 			
 			//Then we get the key of the current system if there is one
 			$params = array(":id" => $id, ":k" => $key);
