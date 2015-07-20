@@ -21,6 +21,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
 
@@ -123,7 +124,8 @@ public class CoFileMenu extends CoInterface {
     private JList setVersions() {
         if(selected != null) {
 
-            List versions = controller.getOldVersionsOfFile(selected.getPath());
+            List versions = controller.getOldVersionsOfFile(Paths.get(Config.root).relativize(selected.toPath()).toString());
+
             versionsList = new JList<String>(new Vector<>(versions));
             versionsList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
             versionsList.setLayoutOrientation(JList.VERTICAL);
@@ -137,7 +139,7 @@ public class CoFileMenu extends CoInterface {
 
                         int returnVal = chooser.showOpenDialog(null);
                         if(returnVal == JFileChooser.APPROVE_OPTION) {
-                            controller.getRevision(selected.getPath(), chooser.getSelectedFile().getAbsolutePath(), versions, list.locationToIndex(evt.getPoint()));
+                            controller.getRevision(Paths.get(Config.root).relativize(selected.toPath()).toString(), chooser.getSelectedFile().getAbsolutePath(), versions, list.locationToIndex(evt.getPoint()));
                         }
                     }
                 }
@@ -153,6 +155,7 @@ public class CoFileMenu extends CoInterface {
     private void updateVersions() {
         versionsList = setVersions();
         versionsList.revalidate();
+        repaint();
     }
 
     private void setSouth() {
