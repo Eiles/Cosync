@@ -9,6 +9,7 @@ import Controllers.Config;
 import Interface.Events.FilesEvents;
 import Interface.Events.InterfaceEvents;
 import Models.CoFileTreeModel;
+import com.sun.org.apache.xpath.internal.SourceTree;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -22,6 +23,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
@@ -115,8 +117,8 @@ public class CoFileMenu extends CoInterface {
         versionsList.setLayoutOrientation(JList.VERTICAL);
 
         versionPanel = new JScrollPane(versionsList);
+        versionPanel.setPreferredSize(new Dimension(130, this.getHeight()));
         versionPanel.setBorder(new LineBorder(Color.black.darkGray));
-
 
         center.add(filesTree, BorderLayout.CENTER);
         center.add(versionPanel, BorderLayout.EAST);
@@ -125,25 +127,39 @@ public class CoFileMenu extends CoInterface {
     }
 
     private void setVersions() {
-        if(selected != null) {
+        if (selected != null) {
+            if (controller.getOldVersionsOfFile(Paths.get(Config.root).relativize(selected.toPath()).toString()) != null) {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-            List versions = controller.getOldVersionsOfFile(Paths.get(Config.root).relativize(selected.toPath()).toString());
-            versionsList.setListData(new Vector<String>(versions));
+                List versions = controller.getOldVersionsOfFile(Paths.get(Config.root).relativize(selected.toPath()).toString());
+                LinkedList<String> oldDate = new LinkedList<>();
 
-            versionsList.addMouseListener(new MouseAdapter() {
-                public void mouseClicked(MouseEvent evt) {
-                    JList list = (JList) evt.getSource();
-                    if (evt.getClickCount() == 2) {
-                        JFileChooser chooser = new JFileChooser();
-                        chooser.setDialogTitle("Choix de destination du fichier");
+                String version;
+                for (int i = 0; i < versions.size(); i++) {
+                    version = (String) versions.get(i);
 
-                        int returnVal = chooser.showOpenDialog(null);
-                        if(returnVal == JFileChooser.APPROVE_OPTION) {
-                            controller.getRevision(Paths.get(Config.root).relativize(selected.toPath()).toString(), chooser.getSelectedFile().getAbsolutePath(), versions, list.locationToIndex(evt.getPoint()));
+                    Date date = new Date();
+                    date.setTime(Long.parseLong(version.substring(version.indexOf("_") + 1, version.lastIndexOf("-"))));
+                    oldDate.add(sdf.format(date));
+                }
+
+                versionsList.setListData(new Vector<String>(oldDate));
+
+                versionsList.addMouseListener(new MouseAdapter() {
+                    public void mouseClicked(MouseEvent evt) {
+                        JList list = (JList) evt.getSource();
+                        if (evt.getClickCount() == 2) {
+                            JFileChooser chooser = new JFileChooser();
+                            chooser.setDialogTitle("Choix de la destination du fichier");
+
+                            int returnVal = chooser.showSaveDialog(null);
+                            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                                controller.getRevision(Paths.get(Config.root).relativize(selected.toPath()).toString(), chooser.getSelectedFile().getAbsolutePath(), versions, list.locationToIndex(evt.getPoint()));
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
         }
     }
 
