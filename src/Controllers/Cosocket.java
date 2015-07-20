@@ -384,7 +384,7 @@ public class Cosocket implements Runnable {
             i++;
         }
 
-        RandomAccessFile raf=new RandomAccessFile(Config.root+"/"+sharedSignal.getFileInfo().getPath(),"rw");
+        RandomAccessFile raf=new RandomAccessFile("tmp/"+sharedSignal.getFileInfo().getPath(),"rw");
         raf.seek(1024*1024*Integer.parseInt(args[1]));
         raf.write(writeBlock,0,writeBlock.length);
         raf.close();

@@ -105,6 +105,19 @@ public class Cofile implements Config,Serializable{
         return DiffUtils.diff(original, revised);
     }
 
+    public void savePatch(Patch patch, String path) {
+        try {
+            FileOutputStream fos = new FileOutputStream(path);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(patch);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public long getModDate() {
         return modDate;
     }

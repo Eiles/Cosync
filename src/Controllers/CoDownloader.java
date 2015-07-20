@@ -6,6 +6,7 @@ import Models.Cofile;
 import Models.Cosystem;
 import Models.Couser;
 import com.sun.org.apache.xpath.internal.SourceTree;
+import difflib.Patch;
 
 import javax.swing.*;
 import java.io.BufferedReader;
@@ -216,7 +217,7 @@ public class CoDownloader implements Runnable{
                     }
 
                     // S'il le fichier est plus récent
-                    else if(controller.getCoDB().getDateForFile(args[0]) < Long.parseLong(args[2])) {
+                    else if(controller.getCoDB().getModifiedAtForFile(args[0]) < Long.parseLong(args[2])) {
                         controller.getCoDB().update("UPDATE FILES SET NEEDDOWNLOAD = 1, MODIFIEDAT = "+Long.parseLong(args[2])+" WHERE PATH ='"+args[0]+"'");
                     }
 
@@ -253,16 +254,10 @@ public class CoDownloader implements Runnable{
                         controller.getCoDB().update("INSERT INTO FILES(PATH,DATE,SUPPRESSED, NEEDDOWNLOAD, MODIFIEDAT) VALUES ('" + files.getString("PATH") + "'," + files.getString("DATE") + ","+(files.getInt("SUPPRESSED")>0?"1":"0")+","+(files.getInt("SUPPRESSED")>0?"0":"1")+"," + files.getLong("MODIFIEDAT") + ")");
                 }
                     else{
-                        if(controller.getCoDB().getDateForFile(files.getString("PATH")) < files.getLong("DATE")){
+                        if(controller.getCoDB().getModifiedAtForFile(files.getString("PATH")) < files.getLong("MODIFIEDAT")){
                                 System.out.println("Update file");
                                 controller.getCoDB().update("UPDATE FILES SET NEEDDOWNLOAD="+(files.getInt("SUPPRESSED")>0?"0":"1")+", SUPPRESSED = "+files.getInt("SUPPRESSED")+", MODIFIEDAT =+" + files.getLong("MODIFIEDAT")+" WHERE PATH='"+files.getString("PATH")+"'");
                         }
-                    }
-                }
-                files = controller.getCoDB().getFiles();
-                while(files.next()) {
-                    if(files.getInt("NEEDDOWNLOAD") == 1) {
-                        this.downSignal.addRequest(files.getString("PATH"));
                     }
                 }
                 controller.getCoDB().update("INSERT INTO LASTDB (SYSTEM, UPDATEDATE) VALUES ('"+system+"',"+System.currentTimeMillis()+")");
@@ -271,7 +266,12 @@ public class CoDownloader implements Runnable{
                 e.printStackTrace();
             }
         }
-
+        files = controller.getCoDB().getFiles();
+        while(files.next()) {
+            if(files.getInt("NEEDDOWNLOAD") == 1) {
+                this.downSignal.addRequest(files.getString("PATH"));
+            }
+        }
     }
 
     public void getFile(String path) throws InterruptedException, SQLException {
@@ -297,11 +297,9 @@ public class CoDownloader implements Runnable{
             return;
         }
         long mostRecentDate=0;
-        byte[] mostRecentHash=null;
         for(int i=0;i<socketsToUse.size();i++){
             if(socketsToUse.get(i).getFileInfo().getModDate()>mostRecentDate){
                 mostRecentDate=socketsToUse.get(i).getFileInfo().getModDate();
-                mostRecentHash=socketsToUse.get(i).getFileInfo().getHash();
             }
         }
         System.out.println(mostRecentDate);
@@ -342,6 +340,18 @@ public class CoDownloader implements Runnable{
             }
             Thread.sleep(200);
         }
+        File afile=new File("tmp/"+socketsToUse.get(0).getFileInfo().getPath());
+        String newPath=socketsToUse.get(0).getFileInfo().getPath();
+        if(new File(newPath).exists()){
+            try {
+                Patch patch=socketsToUse.get(0).getFileInfo().generatePatch(newPath,"tmp/"+newPath);
+                socketsToUse.get(0).getFileInfo().savePatch(patch,"diff/"+newPath+"_"+new File(newPath).lastModified()+"-"+socketsToUse.get(0).getFileInfo().getModDate());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        afile.renameTo(new File(Config.root + "/" + socketsToUse.get(0).getFileInfo().getPath()));
         new File(Config.root+"/"+socketsToUse.get(0).getFileInfo().getPath()).setLastModified(socketsToUse.get(0).getFileInfo().getModDate());
         controller.getCoDB().update("UPDATE FILES SET NEEDDOWNLOAD = 0 WHERE PATH ='" + socketsToUse.get(0).getFileInfo().getPath() + "'");
         versionized.addVersionizedFile(path,true);

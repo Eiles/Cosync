@@ -123,6 +123,31 @@ public class CoDB {
             return ret;
         }
     }
+
+    public synchronized long getModifiedAtForFile(String path)
+            throws SQLException {
+        Statement stmt = c.createStatement();
+        long ret = 0;
+        try {
+            stmt = c.createStatement();
+            ResultSet res = stmt.executeQuery("SELECT MODIFIEDAT FROM FILES WHERE PATH='" + path  + "' LIMIT 1");
+            if (res.next())
+                ret = res.getLong(1);
+            c.commit();
+            //System.out.println("Query executed successfully");
+        } catch (SQLException se) {
+            //Handle errors for JDBC
+            se.printStackTrace();
+
+        } finally {
+            try {
+                if (stmt != null)
+                    stmt.close();
+            } catch (SQLException se2) {
+            }
+            return ret;
+        }
+    }
     public synchronized boolean getSuppressedForFile(String path,String filename)
             throws SQLException {
         Statement stmt=null;
