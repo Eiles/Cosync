@@ -53,7 +53,7 @@ public class CoDB {
             c.setAutoCommit(false);
         }
 
-        public void update(String sql)
+        public synchronized void update(String sql)
                 throws SQLException{
             Statement stmt = c.createStatement();
             try{
@@ -99,7 +99,7 @@ public class CoDB {
         }
     }*/
 
-    public long getDateForFile(String path)
+    public synchronized long getDateForFile(String path)
             throws SQLException {
         Statement stmt = c.createStatement();
         long ret = 0;
@@ -123,7 +123,7 @@ public class CoDB {
             return ret;
         }
     }
-    public boolean getSuppressedForFile(String path,String filename)
+    public synchronized boolean getSuppressedForFile(String path,String filename)
             throws SQLException {
         Statement stmt=null;
         boolean ret = false;
@@ -148,7 +148,7 @@ public class CoDB {
         }
     }
 
-    public ResultSet getModifiedFiles(long date) throws SQLException {
+    public synchronized ResultSet getModifiedFiles(long date) throws SQLException {
         Statement stmt=null;
         String ret=null;
         stmt = c.createStatement();
@@ -158,42 +158,42 @@ public class CoDB {
         return res;
     }
 
-    public int getInsertSize() {
+    public synchronized int getInsertSize() {
         return insertSize;
     }
 
-    public void setInsertSize(int insertSize) {
+    public synchronized void setInsertSize(int insertSize) {
         this.insertSize = insertSize;
     }
 
-    public int getUpdateSize() {
+    public synchronized int getUpdateSize() {
         return updateSize;
     }
 
-    public void setUpdateSize(int updateSize) {
+    public synchronized void setUpdateSize(int updateSize) {
         this.updateSize = updateSize;
     }
 
-    public void prepareInsertBatch(String sql)
+    public synchronized void prepareInsertBatch(String sql)
             throws SQLException {
         this.insertFileBatch =c.prepareStatement(sql);
     }
-    public void prepareUpdateBatch(String sql)
+    public synchronized void prepareUpdateBatch(String sql)
             throws SQLException {
         this.updateFileBatch =c.prepareStatement(sql);
     }
 
-    public void prepareUpdateLastDBBatch(String sql)
+    public synchronized void prepareUpdateLastDBBatch(String sql)
             throws SQLException {
         this.updateLastDBBatch=c.prepareStatement(sql);
     }
 
-    public void prepareInsertLastDBBatch(String sql)
+    public synchronized void prepareInsertLastDBBatch(String sql)
             throws SQLException {
         this.updateLastDBBatch=c.prepareStatement(sql);
     }
 
-    public void addForBatchInsert(String path,String name, long date,int suppressed)
+    public synchronized void addForBatchInsert(String path,String name, long date,int suppressed)
             throws SQLException {
             insertFileBatch.setString(1, path);
             insertFileBatch.setLong(2, date);

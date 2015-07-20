@@ -16,10 +16,7 @@ import java.net.*;
 import java.nio.file.Path;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by elie on 19/06/15.
@@ -46,8 +43,8 @@ public class CoDownloader implements Runnable{
         try {
             System.out.println("Start CoDownloader");
             dbSockets = new HashMap<>();
-            init:
             initSockets();
+            long startTime= System.currentTimeMillis();
             while (true){
                 if(downSignal.requestList.size()!=0){
                     System.out.println("Request list => "+downSignal.requestList.size());
@@ -58,6 +55,11 @@ public class CoDownloader implements Runnable{
                         refreshSockets();
                     }
                     getFile(request);
+                }else{
+                    if(System.currentTimeMillis()-startTime>30000){
+                        refreshSockets();
+                        startTime=System.currentTimeMillis();
+                    }
                 }
                 Thread.sleep(500);
             }
@@ -210,7 +212,7 @@ public class CoDownloader implements Runnable{
 
                     //Si le fichier est nouveau
                     if(controller.getCoDB().getDateForFile(args[0]) == 0){
-                        controller.getCoDB().update("INSERT INTO FILES(PATH,DATE,NEEDDOWNLOAD,SUPPRESSED,MODIFIEDAT) VALUES ('" + args[0] + "'," + System.currentTimeMillis() + "1,0," +"'"+ args[2]+"'");
+                        controller.getCoDB().update("INSERT INTO FILES(PATH,DATE,NEEDDOWNLOAD,SUPPRESSED,MODIFIEDAT) VALUES ('" + args[0] + "'," + System.currentTimeMillis() + ",1,0,"+ args[2]+")");
                     }
 
                     // S'il le fichier est plus récent
@@ -220,7 +222,7 @@ public class CoDownloader implements Runnable{
 
                     // Si le fichier est à supprimer
                     else if(Integer.parseInt(args[1]) == 1) {
-                        controller.getCoDB().update("UPDATE FILES SET SUPPRESSED = 1, MODIFIEDAT = "+args[2]+" WHERE PATH ="+args[0]+"'");
+                        controller.getCoDB().update("UPDATE FILES SET SUPPRESSED = 1, MODIFIEDAT = "+args[2]+" WHERE PATH ='"+args[0]+"'");
                     }
                 }
 
@@ -318,6 +320,7 @@ public class CoDownloader implements Runnable{
         for(int i=0;i<blockState.length;i++){
             blockState[i]=0;
         }
+        versionized.addVersionizedFile(path,false);
         downloadStart=System.currentTimeMillis();
         while(!allBlocksAreDownloaded()){
             for(int i=0;i<socketsToUse.size();i++){
@@ -341,7 +344,7 @@ public class CoDownloader implements Runnable{
         }
         new File(Config.root+"/"+socketsToUse.get(0).getFileInfo().getPath()).setLastModified(socketsToUse.get(0).getFileInfo().getModDate());
         controller.getCoDB().update("UPDATE FILES SET NEEDDOWNLOAD = 0 WHERE PATH ='" + socketsToUse.get(0).getFileInfo().getPath() + "'");
-
+        versionized.addVersionizedFile(path,true);
         System.out.println("File downloaded in : "+(System.currentTimeMillis()-downloadStart)/1000+" sec 2");
         for(int i=0;i<socketArray.size();i++){
             socketArray.get(i).setFileInfo(null);

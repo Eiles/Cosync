@@ -38,10 +38,10 @@ public class CoController extends Thread {
     private Thread downloadThread;
     private CoDownloadMenu download;
 
-    public CoDB getCoDB() {
+    public synchronized CoDB getCoDB() {
         return coDB;
     }
-    public void setCoDB(CoDB coDB) {
+    public synchronized void setCoDB(CoDB coDB) {
         this.coDB = coDB;
     }
     public Couser getUser() {
@@ -67,10 +67,11 @@ public class CoController extends Thread {
 
         coDB = new CoDB();
         coserver = new Coserver();
+        versionized = new CoVersionized();
         watcher = new CoWatcher(dir, true, this, versionized);
         downSignal = new CoDownSignal();
         downloader = new CoDownloader(downSignal, this, versionized);
-        versionized = new CoVersionized();
+
 
         events = new Stack<>();
         views  = new HashMap<>();
