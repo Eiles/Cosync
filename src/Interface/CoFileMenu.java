@@ -11,13 +11,18 @@ import Interface.Events.InterfaceEvents;
 import Models.CoFileTreeModel;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.*;
+import java.util.List;
 
 /**
  * Created by Alban on 15/06/2015.
@@ -34,11 +39,11 @@ public class CoFileMenu extends CoInterface {
     private JPanel east;
     private JPanel south;
 
-    private JPanel filesPanel;
     private JTree filesTree;
+    private JScrollPane versionPanel;
+    private JList<String> versionsList;
 
     private JToolBar toolBar;
-    private JToolBar fileBar;
 
     private Label header;
     private File selected;
@@ -68,25 +73,6 @@ public class CoFileMenu extends CoInterface {
         north = new JPanel();
         north.setLayout(new BorderLayout());
 
-        final JButton add = new JButton("Ajout");
-        add.addActionListener(events.getAddButtonEvent());
-        add.setAlignmentX(RIGHT_ALIGNMENT);
-
-        final JButton edit = new JButton("Edition");
-        edit.addActionListener(null);
-        edit.setAlignmentX(LEFT_ALIGNMENT);
-
-        final JButton delete = new JButton("Suppression");
-        delete.addActionListener(events.getDeleteButtonEvent());
-        delete.setAlignmentX(LEFT_ALIGNMENT);
-
-
-        fileBar = new JToolBar();
-        fileBar.add(add);
-        fileBar.add(delete);
-        fileBar.add(edit);
-
-        north.add(fileBar);
         add(north, BorderLayout.NORTH);
     }
 
@@ -97,16 +83,12 @@ public class CoFileMenu extends CoInterface {
         header = new Label();
         center.add(header, BorderLayout.NORTH);
 
-        filesPanel = new JPanel();
-
         File root = new File(Config.root);
         CoFileTreeModel model = new CoFileTreeModel(root);
 
-        filesPanel.add(new Label("Events Panel"));
-
         filesTree = new JTree();
         filesTree.setModel(model);
-        filesTree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+        filesTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
         filesTree.addTreeSelectionListener(new TreeSelectionListener() {
             @Override
@@ -120,14 +102,57 @@ public class CoFileMenu extends CoInterface {
 
                 if (node.isFile()) {
                     selected = node;
+                    updateVersions();
                 }
             }
         });
 
         filesTree.clearSelection();
+
+        versionsList = setVersions();
+        versionPanel = new JScrollPane(versionsList);
+        versionPanel.setBorder(new LineBorder(Color.black.darkGray));
+
+
         center.add(filesTree, BorderLayout.CENTER);
+        center.add(versionPanel, BorderLayout.EAST);
 
         add(center, BorderLayout.CENTER);
+    }
+
+    private JList setVersions() {
+        if(selected != null) {
+
+            List versions = controller.getOldVersionsOfFile(selected.getPath());
+            versionsList = new JList<String>(new Vector<>(versions));
+            versionsList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+            versionsList.setLayoutOrientation(JList.VERTICAL);
+
+            versionsList.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent evt) {
+                    JList list = (JList) evt.getSource();
+                    if (evt.getClickCount() == 2) {
+                        JFileChooser chooser = new JFileChooser();
+                        chooser.setDialogTitle("Choix de destination du fichier");
+
+                        int returnVal = chooser.showOpenDialog(null);
+                        if(returnVal == JFileChooser.APPROVE_OPTION) {
+                            controller.getRevision(selected.getPath(), chooser.getSelectedFile().getAbsolutePath(), versions, list.locationToIndex(evt.getPoint()));
+                        }
+                    }
+                }
+            });
+        }
+        else {
+            versionsList = null;
+        }
+
+        return versionsList;
+    }
+
+    private void updateVersions() {
+        versionsList = setVersions();
+        versionsList.revalidate();
     }
 
     private void setSouth() {
