@@ -13,4 +13,3 @@ hs_err_pid*
 .idea/copyright/profiles_settings.xml
 cosync.db
 .idea/workspace.xml
-.idea/libraries/sqlitejdbc.xml
