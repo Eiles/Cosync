@@ -402,7 +402,7 @@ public class Cosocket implements Runnable {
 
     public void sendBlock(String[] args) throws IOException, InterruptedException {
 
-        RandomAccessFile raf=new RandomAccessFile(Config.root+"/"+args[0],"r");
+        RandomAccessFile raf=new RandomAccessFile(System.getProperties().getProperty("user.home")+"/Cosync"+"/"+args[0],"r");
         byte[] block=new byte[1024*1024];
         raf.seek(1024*1024*Integer.parseInt(args[1]));
         int read=raf.read(block,0,block.length);
@@ -445,7 +445,7 @@ public class Cosocket implements Runnable {
 
 
     public void hasFile(String path) throws IOException {
-        if(new File(Config.root+"/"+path).exists())
+        if(new File(System.getProperties().getProperty("user.home")+"/Cosync"+"/"+path).exists())
             sendRequest("hasFileResponse:"+path+":true");
         else
             sendRequest("hasFileResponse:"+path+":false");

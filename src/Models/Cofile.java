@@ -39,7 +39,7 @@ public class Cofile implements Config,Serializable{
         this.path = path;
     }
     public String getAbsolutePath(){
-        return root+"/"+path;
+        return System.getProperties().getProperty("user.home")+"/Cosync"+"/"+path;
     }
 
     public void generateHash() throws NoSuchAlgorithmException, IOException{

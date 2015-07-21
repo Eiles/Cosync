@@ -86,7 +86,7 @@ public class CoFileMenu extends CoInterface {
         header = new Label();
         center.add(header, BorderLayout.NORTH);
 
-        File root = new File(Config.root);
+        File root = new File(System.getProperties().getProperty("user.home")+"/Cosync");
         CoFileTreeModel model = new CoFileTreeModel(root);
 
         filesTree = new JTree();
@@ -128,7 +128,7 @@ public class CoFileMenu extends CoInterface {
 
                     int returnVal = chooser.showSaveDialog(null);
                     if (returnVal == JFileChooser.APPROVE_OPTION) {
-                        controller.getRevision(Paths.get(Config.root).relativize(selected.toPath()).toString(), chooser.getSelectedFile().getAbsolutePath(), versions, list.locationToIndex(evt.getPoint()));
+                        controller.getRevision(Paths.get(System.getProperties().getProperty("user.home")+"/Cosync").relativize(selected.toPath()).toString(), chooser.getSelectedFile().getAbsolutePath(), versions, list.locationToIndex(evt.getPoint()));
                     }
 
                 }
@@ -143,11 +143,11 @@ public class CoFileMenu extends CoInterface {
 
     private void setVersions() {
         if (selected != null) {
-            System.out.println((Paths.get(Config.root).relativize(selected.toPath()).toString()));
-            if (controller.getOldVersionsOfFile(Paths.get(Config.root).relativize(selected.toPath()).toString()) != null) {
+            System.out.println((Paths.get(System.getProperties().getProperty("user.home")+"/Cosync").relativize(selected.toPath()).toString()));
+            if (controller.getOldVersionsOfFile(Paths.get(System.getProperties().getProperty("user.home")+"/Cosync").relativize(selected.toPath()).toString()) != null) {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-                versions = controller.getOldVersionsOfFile(Paths.get(Config.root).relativize(selected.toPath()).toString());
+                versions = controller.getOldVersionsOfFile(Paths.get(System.getProperties().getProperty("user.home")+"/Cosync").relativize(selected.toPath()).toString());
                 LinkedList<String> oldDate = new LinkedList<>();
 
                 String version;
@@ -215,7 +215,7 @@ public class CoFileMenu extends CoInterface {
     }
 
     private void updateFileTree() {
-        File root = new File(Config.root);
+        File root = new File(System.getProperties().getProperty("user.home")+"/Cosync");
         CoFileTreeModel model = new CoFileTreeModel(root);
 
         filesTree.clearSelection();

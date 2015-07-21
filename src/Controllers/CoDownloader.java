@@ -342,18 +342,18 @@ public class CoDownloader implements Runnable{
         }
         File afile=new File("tmp/"+socketsToUse.get(0).getFileInfo().getPath());
         String newPath=socketsToUse.get(0).getFileInfo().getPath();
-        if(new File(Config.root+"/"+newPath).exists()){
+        if(new File(System.getProperties().getProperty("user.home")+"/Cosync"+"/"+newPath).exists()){
             try {
                 System.out.println("Saving patch !");
-                socketsToUse.get(0).getFileInfo().savePatch(Config.root+"/"+newPath,"tmp/"+newPath,"diff/"+newPath+"_"+new File(Config.root+"/"+newPath).lastModified()+"-"+socketsToUse.get(0).getFileInfo().getModDate());
+                socketsToUse.get(0).getFileInfo().savePatch(System.getProperties().getProperty("user.home")+"/Cosync"+"/"+newPath,"tmp/"+newPath,"diff/"+newPath+"_"+new File(System.getProperties().getProperty("user.home")+"/Cosync"+"/"+newPath).lastModified()+"-"+socketsToUse.get(0).getFileInfo().getModDate());
                 //socketsToUse.get(0).getFileInfo().restoreFromDiff(Config.root+"/"+newPath,"diff/"+newPath+"_"+new File(Config.root+"/"+newPath).lastModified()+"-"+socketsToUse.get(0).getFileInfo().getModDate(),"/Users/elie/restored");
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        afile.renameTo(new File(Config.root + "/" + socketsToUse.get(0).getFileInfo().getPath()));
-        new File(Config.root+"/"+socketsToUse.get(0).getFileInfo().getPath()).setLastModified(socketsToUse.get(0).getFileInfo().getModDate());
+        afile.renameTo(new File(System.getProperties().getProperty("user.home")+"/Cosync" + "/" + socketsToUse.get(0).getFileInfo().getPath()));
+        new File(System.getProperties().getProperty("user.home")+"/Cosync"+"/"+socketsToUse.get(0).getFileInfo().getPath()).setLastModified(socketsToUse.get(0).getFileInfo().getModDate());
         controller.getCoDB().update("UPDATE FILES SET NEEDDOWNLOAD = 0 WHERE PATH ='" + socketsToUse.get(0).getFileInfo().getPath() + "'");
         versionized.addVersionizedFile(path,true);
         System.out.println("File downloaded in : "+(System.currentTimeMillis()-downloadStart)/1000+" sec 2");

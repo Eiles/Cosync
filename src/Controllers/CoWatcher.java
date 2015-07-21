@@ -132,7 +132,7 @@ public class CoWatcher extends Thread{
                     if(active) {
                         if (Files.isDirectory(child, NOFOLLOW_LINKS)) {
                             try {
-                                String path = Paths.get(Config.root).relativize(child).toString();
+                                String path = Paths.get(System.getProperties().getProperty("user.home")+"/Cosync").relativize(child).toString();
                                 this.registerAll(child.getParent());
                                 System.out.println(path);
                                 System.out.println("UPDATE FILES SET SUPPRESSED=1" + " ,MODIFIEDAT=" + System.currentTimeMillis() + "  WHERE PATH LIKE '" + path + "%'");
@@ -143,7 +143,7 @@ public class CoWatcher extends Thread{
                         } else {
                             try {
                                 System.out.format("%s: %s\n", event.kind().name(), child.getFileName());
-                                String path = Paths.get(Config.root).relativize(child).toString();
+                                String path = Paths.get(System.getProperties().getProperty("user.home")+"/Cosync").relativize(child).toString();
                                 long datesql = new File(child.toUri()).lastModified();
                                 System.out.println("Supprimé le " + datesql);
                                 db.update("UPDATE FILES SET SUPPRESSED=1" + " ,MODIFIEDAT=" + System.currentTimeMillis() + "  WHERE PATH LIKE '" + path + "/%'");
@@ -167,7 +167,7 @@ public class CoWatcher extends Thread{
                         } else {
                             try {
                                 System.out.format("%s: %s\n", event.kind().name(), child.getFileName());
-                                String path = Paths.get(Config.root).relativize(child).toString();
+                                String path = Paths.get(System.getProperties().getProperty("user.home")+"/Cosync").relativize(child).toString();
                                 long datesql = new File(child.toUri()).lastModified();
                                 System.out.println("Modifié le " + datesql);
                                 db.update("UPDATE FILES SET DATE=" + datesql + ", MODIFIEDAT=" + datesql + " WHERE PATH='" + path + "'");
@@ -190,7 +190,7 @@ public class CoWatcher extends Thread{
                                 //On enregistre en base les nouveaux fichiers
                                 try {
                                     System.out.format("%s: %s\n", event.kind().name(), child.getFileName());
-                                    String path = Paths.get(Config.root).relativize(child).toString();
+                                    String path = Paths.get(System.getProperties().getProperty("user.home")+"/Cosync").relativize(child).toString();
                                     long datesql = new File(child.toUri()).lastModified();
                                     System.out.println("Créé le " + datesql);
                                     db.update("INSERT INTO FILES(PATH,DATE,SUPPRESSED,MODIFIEDAT) VALUES ('" + path + "'," + datesql + ",0," + datesql + ")");
@@ -223,7 +223,7 @@ public class CoWatcher extends Thread{
     public static void check(Path file,CoDB db) throws ParseException, SQLException {
         cpt++;
         File fic=new File(file.toUri());
-        String path= Paths.get(Config.root).relativize(file).toString();
+        String path= Paths.get(System.getProperties().getProperty("user.home")+"/Cosync").relativize(file).toString();
         String filename=file.getFileName().toString();
         long datesql=fic.lastModified();
         long olddate=db.getDateForFile(path.toString());
@@ -275,7 +275,7 @@ public class CoWatcher extends Thread{
             while(true){
                 System.out.println(idIncrementer);
                 path=db.getFilePathById(idIncrementer);
-                if(path!=null && !Paths.get(Config.root+"/"+path).toFile().exists()){
+                if(path!=null && !Paths.get(System.getProperties().getProperty("user.home")+"/Cosync"+"/"+path).toFile().exists()){
                     db.update("UPDATE FILES SET SUPPRESSED=1 WHERE ID="+idIncrementer);
                     suppressed++;
                 }

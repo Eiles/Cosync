@@ -64,8 +64,10 @@ public class CoController extends Thread {
     }
 
     public CoController() throws SQLException, IOException {
-        Path dir = new File(Config.root).toPath();
-
+        Path dir = new File(System.getProperties().getProperty("user.home")+"/Cosync").toPath();
+        if(!(new File(System.getProperties().getProperty("user.home")+"/Cosync").exists())){
+            new File(System.getProperties().getProperty("user.home")+"/Cosync").mkdir();
+        }
         coDB = new CoDB();
         coserver = new Coserver(this);
         versionized = new CoVersionized();
@@ -247,7 +249,7 @@ public class CoController extends Thread {
 
 
             watcher.start();
-            watcher.checkFolder(Paths.get(Config.root), coDB);
+            watcher.checkFolder(Paths.get(System.getProperties().getProperty("user.home")+"/Cosync"), coDB);
             watcher.saveSuppressed(coDB);
 
             return true;
@@ -290,7 +292,7 @@ public class CoController extends Thread {
         Cofile fic= new Cofile(path,0,false);
         String thePath=path;
         for(int i=0;i<=index;i++){
-            fic.restoreFromDiff(Config.root+"/"+thePath,"diff/"+path+"_"+list.get(i),"tmp/revised");
+            fic.restoreFromDiff(System.getProperties().getProperty("user.home")+"/Cosync"+"/"+thePath,"diff/"+path+"_"+list.get(i),"tmp/revised");
             thePath="tmp/revised";
         }
         File output = new File("tmp/revised");
