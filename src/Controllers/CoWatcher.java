@@ -168,7 +168,7 @@ public class CoWatcher extends Thread{
                             try {
                                 System.out.format("%s: %s\n", event.kind().name(), child.getFileName());
                                 String path = Paths.get(System.getProperties().getProperty("user.home")+"/Cosync").relativize(child).toString();
-                                long datesql = new File(child.toUri()).lastModified();
+                                long datesql = System.currentTimeMillis();
                                 System.out.println("Modifié le " + datesql);
                                 db.update("UPDATE FILES SET DATE=" + datesql + ", MODIFIEDAT=" + datesql + " WHERE PATH='" + path + "'");
                             } catch (Exception se) {
@@ -191,7 +191,7 @@ public class CoWatcher extends Thread{
                                 try {
                                     System.out.format("%s: %s\n", event.kind().name(), child.getFileName());
                                     String path = Paths.get(System.getProperties().getProperty("user.home")+"/Cosync").relativize(child).toString();
-                                    long datesql = new File(child.toUri()).lastModified();
+                                    long datesql = System.currentTimeMillis();
                                     System.out.println("Créé le " + datesql);
                                     db.update("INSERT INTO FILES(PATH,DATE,SUPPRESSED,MODIFIEDAT) VALUES ('" + path + "'," + datesql + ",0," + datesql + ")");
                                 } catch (Exception se) {
