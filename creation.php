@@ -2,10 +2,10 @@
 	require_once 'tool.php';
 	require_once 'user.php';
 	displayHTMLHeader("Creation de compte");
-	deconnection("http://localhost/coSync/creation.php","Retour à l'accueil");
+	deconnection("http://localhost/api/creation.php","Retour à l'accueil");
 		
 	if(isset($_POST["deconnection"])){
-		header("Location: http://localhost/coSync/accueil.php");
+		header("Location: http://localhost/api/accueil.php");
 	}
 ?>
 	<h1>Bienvenue dans la page de création de compte.<br><br>

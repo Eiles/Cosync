@@ -31,7 +31,7 @@
 			$password=$_POST["password"];
 			
 			if(connection($username,$password, "nokey"))
-				header("Location: http://localhost/coSync/account.php");
+				header("Location: http://localhost/api/account.php");
 			else alert("Mauvais username ou mauvais mot de passe");
 		}	
 	?>

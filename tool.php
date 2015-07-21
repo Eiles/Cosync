@@ -1,11 +1,11 @@
-﻿<?php
+<?php
 	//Function to deconnect user of the website after X min of inactivity
 	function startSession(){
 		session_start();
 		if(time()-$_SESSION["arriver"]>25*60){
 			session_destroy();
 			unset($_SESSION);
-			header("Location: http://localhost/coSync/accueil.php");
+			header("Location: http://localhost/api/accueil.php");
 		}
 	}
 	
@@ -39,7 +39,7 @@
 			$_SESSION=array();
 			session_destroy();
 			unset($_SESSION);
-			header("Location: http://localhost/coSync/accueil.php");
+			header("Location: http://localhost/api/accueil.php");
 		}
 	}
 	
